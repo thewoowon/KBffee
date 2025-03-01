@@ -1,4 +1,4 @@
-package com.kbffee
+package com.thewoowon.kbffee
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
