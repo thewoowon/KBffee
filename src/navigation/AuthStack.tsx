@@ -1,10 +1,15 @@
 import {createStackNavigator} from '@react-navigation/stack';
-import {SignInScreen} from '../screens/auth';
+import {ModeSelectionScreen, SignInScreen} from '../screens/auth';
 
 const Stack = createStackNavigator();
 
 const AuthStack = () => (
   <Stack.Navigator>
+    <Stack.Screen
+      name="ModeSelection"
+      component={ModeSelectionScreen}
+      options={{headerShown: false}}
+    />
     <Stack.Screen
       name="SignIn"
       component={SignInScreen}
