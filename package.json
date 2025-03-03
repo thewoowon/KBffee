@@ -24,6 +24,7 @@
     "react-native-reanimated": "^3.16.7",
     "react-native-safe-area-context": "^5.2.0",
     "react-native-screens": "^4.9.0",
+    "react-native-svg": "^15.11.2",
     "react-native-toast-message": "^2.2.1"
   },
   "devDependencies": {
