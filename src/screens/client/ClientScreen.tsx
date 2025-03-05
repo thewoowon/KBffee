@@ -14,13 +14,13 @@ const ClientStack = () => (
       options={{headerShown: false}}
     />
     <Stack.Screen
-      name="Terms"
-      component={TermsScreen}
+      name="NumberInput"
+      component={NumberInputScreen}
       options={{headerShown: false}}
     />
     <Stack.Screen
-      name="NumberInput"
-      component={NumberInputScreen}
+      name="Terms"
+      component={TermsScreen}
       options={{headerShown: false}}
     />
     <Stack.Screen

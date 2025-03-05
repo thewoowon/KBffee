@@ -1,15 +1,29 @@
 import React, {useEffect} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
+import {useAuth} from '../../hooks';
 
 const StandbyScreen = ({navigation, route}: any) => {
+  const {storeCode} = useAuth();
   useEffect(() => {
+    if (!storeCode) {
+      console.log('storeCode is not found');
+      return;
+    }
     const db = getFirestore();
-    const sessionRef = doc(db, 'sessions', 'session_ABC123');
+    const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
 
     const unsubscribe = onSnapshot(sessionRef, doc => {
       if (doc.exists) {
         const data = doc.data();
+        console.log('Current data: ', data);
         if (!data) {
           console.log('No data found');
           return;
@@ -36,7 +50,10 @@ const StandbyScreen = ({navigation, route}: any) => {
       />
       <SafeAreaView style={styles.backgroundStyle}>
         <View style={styles.container}>
-          <Text>Standby Screen</Text>
+          <Image
+            style={{width: 'auto', height: 'auto', flex: 1}}
+            source={require('../../assets/images/pexels-steve-1690351.jpg')}
+          />
         </View>
       </SafeAreaView>
     </View>
