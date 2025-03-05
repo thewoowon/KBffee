@@ -15,7 +15,7 @@ const SignInScreen = ({navigation, route}: any) => {
   const mode = route.params?.mode;
   const title = mode === 'supervisor' ? '관리자 로그인' : '고객 로그인';
 
-  const {setIsAuthenticated} = useAuth();
+  const {setIsAuthenticated, setMode, initStoreCode} = useAuth();
   const {getStores} = useFirestore();
 
   const [storeCode, setStoreCode] = useState('');
@@ -34,7 +34,9 @@ const SignInScreen = ({navigation, route}: any) => {
       return;
     }
 
+    setMode(mode);
     setIsAuthenticated(true);
+    initStoreCode(storeCode);
   };
   return (
     <View style={styles.container}>
