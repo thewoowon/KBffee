@@ -40,7 +40,7 @@ const useFirestore = () => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists) {
-        console.log('Document data:', docSnap.data());
+        console.log('User Document data:', docSnap.data());
       } else {
         console.log('No such document!');
       }
@@ -59,7 +59,7 @@ const useFirestore = () => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists) {
-        console.log('Document data:', docSnap.data());
+        console.log('Store Document data:', docSnap.data());
       } else {
         console.log('No such document!');
       }
