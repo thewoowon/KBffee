@@ -5,7 +5,6 @@ import {NavigationContainer} from '@react-navigation/native';
 
 import Toast, {BaseToast, ToastConfig} from 'react-native-toast-message';
 
-import {FIREBASE_API_KEY} from '@env';
 import {AuthProvider} from './src/contexts';
 import RootNavigator from './src/navigation/RootNavigator';
 import {useAuth} from './src/hooks';
