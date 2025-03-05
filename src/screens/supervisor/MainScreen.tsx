@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import {useFirestore} from '../../hooks';
+import {useAuth, useFirestore} from '../../hooks';
 
 const STATISTICS: {
   id: string;
@@ -49,9 +49,10 @@ const STATISTICS: {
 ];
 
 const MainScreen = ({navigation, route}: any) => {
+  const {storeCode} = useAuth();
   const {enterNumber} = useFirestore();
   const handleSearch = async () => {
-    await enterNumber('session_ABC123');
+    await enterNumber(`session_${storeCode}`);
   };
 
   const handleStatistics = () => {
