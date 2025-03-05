@@ -1,1 +1,1 @@
-export {default as ModeScreen} from './ModeScreen';
+export {default as SwitcherScreen} from './SwitcherScreen';

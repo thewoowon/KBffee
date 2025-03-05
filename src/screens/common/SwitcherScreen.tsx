@@ -1,7 +1,11 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {useAuth} from '../../hooks';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useFocusEffect} from '@react-navigation/native';
 
-const ModeScreen = () => {
+const SwitcherScreen = ({navigation, route}: any) => {
   return (
     <View style={styles.container}>
       <StatusBar
@@ -11,7 +15,7 @@ const ModeScreen = () => {
       />
       <SafeAreaView style={styles.backgroundStyle}>
         <View style={styles.container}>
-          <Text>Order Screen</Text>
+          <Text>Switcher Screen</Text>
         </View>
       </SafeAreaView>
     </View>
@@ -27,4 +31,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ModeScreen;
+export default SwitcherScreen;
