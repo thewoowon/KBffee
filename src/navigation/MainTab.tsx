@@ -1,6 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import SupervisorScreen from '../screens/supervisor';
 import ClientScreen from '../screens/client';
+import {SwitcherScreen} from '../screens/common';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,6 +28,16 @@ const MainTab = () => (
       tabBarActiveTintColor: 'blue', // 활성화된 탭의 텍스트 색상
       tabBarInactiveTintColor: 'gray', // 비활성화된 탭의 텍스트 색상
     }}>
+    <Tab.Screen
+      name="Switcher"
+      component={SwitcherScreen}
+      options={{
+        headerShown: false,
+        tabBarItemStyle: {
+          display: 'none',
+        },
+      }}
+    />
     <Tab.Screen
       name="Supervisor"
       component={SupervisorScreen}
