@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -8,7 +8,9 @@ import {
   View,
   Alert,
 } from 'react-native';
-import {useFirestore} from '../../hooks';
+import {useAuth, useFirestore} from '../../hooks';
+import {useFocusEffect} from '@react-navigation/native';
+import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -17,8 +19,9 @@ const NUMBER_SEQUENCE = [
 ];
 
 const NumberInputScreen = ({navigation}: any) => {
+  const {storeCode} = useAuth();
   const [number, setNumber] = useState('');
-  const {getUser} = useFirestore();
+  const {getUser, updateSession} = useFirestore();
 
   const onNumberPress = (value: number | string) => {
     if (value === 'c') {
@@ -26,6 +29,12 @@ const NumberInputScreen = ({navigation}: any) => {
       setNumber(number.slice(0, -1));
       return;
     }
+
+    if (number.length >= 11) {
+      Alert.alert('전화번호는 11자리까지 입력할 수 있습니다.');
+      return;
+    }
+    
     setNumber(number + value);
   };
 
@@ -46,8 +55,39 @@ const NumberInputScreen = ({navigation}: any) => {
 
     // 이미 가입된 사용자라면
     // ...
+    await updateSession(`session_${storeCode}`, {
+      phone: number,
+      mode: '',
+    });
     navigation.navigate('Dashboard', {phoneNumber: number});
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      // session -> phone
+      const db = getFirestore();
+      const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
+
+      const unsubscribe = onSnapshot(sessionRef, doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          console.log('Current data: ', data);
+          if (!data) {
+            console.log('No data found');
+            return;
+          }
+
+          console.log(data);
+          // phone이 있으면 화면 이동
+          if (data.mode !== 'waiting') {
+            navigation.navigate('Standby');
+          }
+        }
+      });
+
+      return () => unsubscribe();
+    }, [storeCode]),
+  ); // ✅ 의존성 배열 `[]` → 최초 1회 실행
 
   return (
     <View style={styles.container}>
