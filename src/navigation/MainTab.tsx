@@ -10,6 +10,7 @@ const MainTab = () => (
     screenOptions={{
       // 간격 조정
       tabBarStyle: {
+        display: 'none',
         height: 86,
         paddingVertical: 10,
       },
