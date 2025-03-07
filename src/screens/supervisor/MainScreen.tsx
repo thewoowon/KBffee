@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {
+  Alert,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -7,8 +8,11 @@ import {
   StyleSheet,
   Text,
   View,
+  Modal,
 } from 'react-native';
 import {useAuth, useFirestore} from '../../hooks';
+import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
+import {useFocusEffect} from '@react-navigation/native';
 
 const STATISTICS: {
   id: string;
@@ -50,14 +54,53 @@ const STATISTICS: {
 
 const MainScreen = ({navigation, route}: any) => {
   const {storeCode} = useAuth();
-  const {enterNumber} = useFirestore();
+  const {enterNumber, updateSession} = useFirestore();
+  const [modalVisible, setModalVisible] = useState(false);
   const handleSearch = async () => {
     await enterNumber(`session_${storeCode}`);
+    setModalVisible(true);
   };
 
   const handleStatistics = () => {
-    navigation.navigate('Statistics');
+    Alert.alert('준비중', '통계 기능은 준비중입니다.');
+    return;
+    // navigation.navigate('Statistics');
   };
+
+  const handleCancel = () => {
+    setModalVisible(false);
+    updateSession(`session_${storeCode}`, {
+      mode: '',
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      // session -> phone
+      const db = getFirestore();
+      const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
+
+      const unsubscribe = onSnapshot(sessionRef, doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          console.log('Current data: ', data);
+          if (!data) {
+            console.log('No data found');
+            return;
+          }
+
+          console.log(data);
+          // phone이 있으면 화면 이동
+          if (data.phone !== '') {
+            setModalVisible(false);
+            navigation.navigate('Detail', {phoneNumber: data.phone});
+          }
+        }
+      });
+
+      return () => unsubscribe();
+    }, [storeCode]),
+  ); // ✅ 의존성 배열 `[]` → 최초 1회 실행
 
   return (
     <View style={styles.container}>
@@ -87,6 +130,16 @@ const MainScreen = ({navigation, route}: any) => {
             </Pressable>
           </View>
         </View>
+        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>번호를 입력하는 중이에요</Text>
+              <Pressable style={[styles.buttonClose]} onPress={handleCancel}>
+                <Text style={styles.textStyle}>번호 입력 취소</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </View>
   );
@@ -103,6 +156,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
+    paddingTop: 30,
+    paddingBottom: 30,
   },
   scrollView: {},
   flexRowBox: {
@@ -127,6 +182,45 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    height: 120,
+    width: 'auto',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+    height: 50,
+    width: 120,
+    borderRadius: 10,
+    elevation: 2,
+    justifyContent: 'center',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
 
