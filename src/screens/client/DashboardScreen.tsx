@@ -44,7 +44,7 @@ const DashboardScreen = ({navigation, route}: any) => {
       const unsubscribe = onSnapshot(userRef, doc => {
         if (doc.exists) {
           const data = doc.data();
-          console.log('Current data: ', data);
+          console.log('Dashboard Current data: ', data);
           if (!data) {
             console.log('No data found');
             return;
@@ -65,7 +65,7 @@ const DashboardScreen = ({navigation, route}: any) => {
       const unsubscribe = onSnapshot(sessionRef, doc => {
         if (doc.exists) {
           const data = doc.data();
-          console.log('Current data: ', data);
+          console.log('Dashboard Current data: ', data);
           if (!data) {
             console.log('No data found');
             return;

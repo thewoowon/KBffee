@@ -26,7 +26,7 @@ const StandbyScreen = ({navigation, route}: any) => {
       const unsubscribe = onSnapshot(sessionRef, doc => {
         if (doc.exists) {
           const data = doc.data();
-          console.log('Current data: ', data);
+          console.log('Standby Current data: ', data);
           if (!data) {
             console.log('No data found');
             return;
