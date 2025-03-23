@@ -82,4 +82,5 @@ yarn-error.log
 firebase.json
 firebase-debug.log
 /ios/*/GoogleService-Info.plist
+/ios/GoogleService-Info.plist
 /android/*/google-services.json
