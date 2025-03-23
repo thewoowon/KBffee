@@ -8,10 +8,10 @@ import {
   where,
   getDocs,
   query,
-  startAt,
-  endAt,
   orderBy,
+  limit,
 } from '@react-native-firebase/firestore';
+import dayjs from 'dayjs';
 
 const useFirestore = () => {
   async function addUser(userId: string) {
@@ -119,25 +119,33 @@ const useFirestore = () => {
   //
   async function getLogs(date: string): Promise<Log[]> {
     try {
-      // 예: date = '2025-02-01'
       const db = getFirestore();
       const logsRef = collection(db, 'logs');
 
+      const start = dayjs(date).startOf('day').toDate();
+      const end = dayjs(date).endOf('day').toDate();
+
       const logsQuery = query(
         logsRef,
-        orderBy('timestamp'),
-        startAt(date),
-        endAt(date + '\uf8ff'), // 유니코드 트릭으로 prefix 매칭
+        where('timestamp', '>=', start),
+        where('timestamp', '<=', end),
+        orderBy('timestamp', 'desc'), // 또는 'desc'
+        limit(100), // 최대 100개
       );
 
       const querySnapshot = await getDocs(logsQuery);
 
       console.log('Logs fetched successfully!');
 
-      const logs = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...(doc.data() as Log),
-      }));
+      const logs = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        console;
+        return {
+          id: doc.id,
+          ...(data as Log),
+          timestamp: data.timestamp.toDate(),
+        };
+      });
 
       console.log('Logs:', logs);
 
@@ -148,7 +156,7 @@ const useFirestore = () => {
     }
   }
 
-  async function addLog(log: Log) {
+  async function addLog(log: LogDto) {
     try {
       const db = getFirestore();
       const logsRef = collection(db, 'logs');

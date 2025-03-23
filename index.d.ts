@@ -26,6 +26,13 @@ interface Store {
 interface Log {
   action: 'stamp_saved' | 'stamp_used';
   phone_number: string;
-  timestamp: string;
+  timestamp: Date;
+  stamp: number;
+}
+
+interface LogDto {
+  action: 'stamp_saved' | 'stamp_used';
+  phone_number: string;
+  timestamp: Timestamp;
   stamp: number;
 }
