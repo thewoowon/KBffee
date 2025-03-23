@@ -28,14 +28,14 @@ const ModeSelectionScreen = ({navigation, route}: any) => {
               onPress={() => {
                 handleSignIn('supervisor');
               }}>
-              <Text style={styles.buttonText}>관리자</Text>
+              <Text style={styles.buttonText}>관리자로 접속하기</Text>
             </Pressable>
             <Pressable
               style={styles.modeContainer}
               onPress={() => {
                 handleSignIn('client');
               }}>
-              <Text style={styles.buttonText}>고객</Text>
+              <Text style={styles.buttonText}>고객으로 접속하기</Text>
             </Pressable>
           </View>
         </View>
@@ -64,11 +64,11 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   modeContainer: {
-    flex: 1,
+    width: 391,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 100,
+    paddingVertical: 88,
     backgroundColor: '#ffffff',
     borderRadius: 10,
     // shadow
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 6,
     },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 10,
   },

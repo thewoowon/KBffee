@@ -11,7 +11,7 @@ const RootNavigator = () => {
   type NavigationProp = StackNavigationProp<
     {
       Supervisor: {screen: 'Main'};
-      Client: {screen: 'Standby'};
+      Client: {screen: 'NumberInput'};
     },
     'Supervisor' | 'Client'
   >;
@@ -22,7 +22,7 @@ const RootNavigator = () => {
       if (mode === 'supervisor') {
         navigation.navigate('Supervisor', {screen: 'Main'});
       } else {
-        navigation.navigate('Client', {screen: 'Standby'});
+        navigation.navigate('Client', {screen: 'NumberInput'});
       }
     }
   }, [isAuthenticated, mode]);
