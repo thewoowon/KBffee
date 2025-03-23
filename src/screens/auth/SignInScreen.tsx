@@ -8,6 +8,9 @@ import {
   Pressable,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import {useAuth, useFirestore} from '../../hooks';
 
@@ -64,15 +67,28 @@ const SignInScreen = ({navigation, route}: any) => {
           </View>
           <Text style={styles.headerText}>{title}</Text>
         </View>
-        <View style={styles.innerContainer}>
-          <View style={styles.flexBox}>
-            <Text style={styles.label}>스토어 코드 입력</Text>
-            <TextInput style={styles.input} onChangeText={handleChange} />
-            <Pressable style={styles.modeContainer} onPress={handleSignIn}>
-              <Text style={styles.modeText}>로그인</Text>
-            </Pressable>
-          </View>
-        </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}>
+          {/* renderContent만 ScrollView로 감싸기 */}
+          <ScrollView
+            contentContainerStyle={{flexGrow: 1, paddingBottom: 20}}
+            keyboardShouldPersistTaps="handled">
+            <View style={styles.innerContainer}>
+              <View style={styles.flexBox}>
+                <Text style={styles.label}>스토어 코드 입력</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange}
+                  placeholder="스토어 코드를 입력해주세요"
+                />
+                <Pressable style={styles.confirmButton} onPress={handleSignIn}>
+                  <Text style={styles.confirmButtonText}>로그인</Text>
+                </Pressable>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   );
@@ -100,7 +116,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   modeContainer: {
-    width: '100%',
+    width: 391,
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 12,
@@ -137,18 +153,42 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Regular',
   },
   label: {
-    fontSize: 16,
+    fontSize: 28,
     color: '#181818',
     fontFamily: 'Pretendard-SemiBold',
-    lineHeight: 24,
+    lineHeight: 34,
   },
   input: {
-    width: '100%',
-    height: 40,
+    width: 391,
+    height: 60,
     borderColor: 'gray',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 5,
     textAlign: 'center',
+    fontSize: 20,
+  },
+  confirmButton: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 391,
+    height: 55,
+    backgroundColor: '#FE8300',
+    borderRadius: 20,
+    // shadow
+    shadowColor: '#FE6D00',
+    shadowOffset: {
+      width: 0,
+      height: 4.5,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    color: 'white',
+    fontFamily: 'Pretendard-Regular',
   },
 });
 
