@@ -17,7 +17,7 @@ const TermsScreen = ({navigation, route}: any) => {
     await addUser(phoneNumber);
     await updateSession(`session_${storeCode}`, {
       phone: phoneNumber,
-      mode: '',
+      mode: 'onboarding',
     });
     navigation.navigate('Dashboard', {phoneNumber});
   };
