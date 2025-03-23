@@ -10,7 +10,12 @@ import {
   Alert,
 } from 'react-native';
 import {useAuth, useFirestore} from '../../hooks';
-import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
+import {
+  doc,
+  getFirestore,
+  onSnapshot,
+  Timestamp,
+} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {
   CircleMinusIcon,
@@ -49,6 +54,11 @@ const DetailScreen = ({navigation, route}: any) => {
   };
 
   const handleApprove = async () => {
+    if (number.length === 0) {
+      Alert.alert('적립할 쿠폰의 수를 입력해주세요', '다시 입력해주세요.');
+      return;
+    }
+
     const numberValue = parseInt(number, 10);
 
     if (numberValue < 1) {
@@ -63,7 +73,7 @@ const DetailScreen = ({navigation, route}: any) => {
       );
       return;
     }
-    
+
     await updateUser(phoneNumber, {
       stamps: user.stamps + numberValue,
     });
@@ -72,13 +82,18 @@ const DetailScreen = ({navigation, route}: any) => {
       action: 'stamp_saved',
       phone_number: phoneNumber,
       stamp: numberValue,
-      timestamp: new Date().toISOString(),
+      timestamp: Timestamp.now(),
     });
 
     setNumber('');
   };
 
   const handleUsing = async () => {
+    if (number.length === 0) {
+      Alert.alert('사용할 쿠폰의 수를 입력해주세요', '다시 입력해주세요.');
+      return;
+    }
+
     const numberValue = parseInt(number, 10);
 
     if (user.stamps < 1) {
@@ -105,7 +120,7 @@ const DetailScreen = ({navigation, route}: any) => {
       action: 'stamp_used',
       phone_number: phoneNumber,
       stamp: numberValue,
-      timestamp: new Date().toISOString(),
+      timestamp: Timestamp.now(),
     });
 
     setNumber('');
@@ -157,6 +172,14 @@ const DetailScreen = ({navigation, route}: any) => {
       3,
       7,
     )}-${phoneNumber.slice(7)}`;
+  };
+
+  const goBack = async () => {
+    await updateSession(`session_${storeCode}`, {
+      phone: '',
+      mode: 'waiting',
+    });
+    // navigation.goBack();
   };
 
   // useFocusEffect(
@@ -280,6 +303,24 @@ const DetailScreen = ({navigation, route}: any) => {
                 borderRadius: 35,
               },
             ]}>
+            <View
+              style={[
+                styles.flexBox,
+                {gap: 7, position: 'absolute', top: 20, left: 20},
+              ]}>
+              <Pressable onPress={goBack}>
+                <LeftArrowIcon />
+              </Pressable>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: 'Pretendard-Regular',
+                  color: '#191D2B',
+                  lineHeight: 19,
+                }}>
+                취소
+              </Text>
+            </View>
             <View
               style={[
                 {
@@ -776,6 +817,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
     fontFamily: 'Pretendard-Regular',
+  },
+  flexBox: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

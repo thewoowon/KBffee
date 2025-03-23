@@ -223,7 +223,7 @@ const MainScreen = ({navigation, route}: any) => {
                 </View>
                 <Text
                   style={{
-                    width: 140,
+                    width: 120,
                     color: '#9F9FA6',
                   }}>
                   일시
@@ -265,7 +265,8 @@ const MainScreen = ({navigation, route}: any) => {
                             }}>
                             {statistic.action === 'stamp_saved'
                               ? '적립'
-                              : '사용'}
+                              : '사용'}{' '}
+                            {statistic.stamp}
                           </Text>
                         </View>
                         <Text style={{color: '#1B2128'}}>
@@ -274,7 +275,7 @@ const MainScreen = ({navigation, route}: any) => {
                       </View>
                       <Text
                         style={{
-                          width: 140,
+                          width: 120,
                           color: '#878B8F',
                           fontSize: 12,
                           lineHeight: 22,
