@@ -36,6 +36,38 @@
     {
       "path": "src/assets/fonts/Pretendard-Thin.otf",
       "sha1": "72cf55b4d2ea4adc75123f33ca839c10cabfaab4"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-black.otf",
+      "sha1": "95a211f130be0584bca8b96f8886fa26e54e4c33"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-bold.otf",
+      "sha1": "7e7bc546371839f6261b7aa3614a7ee270a12504"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-heavy.otf",
+      "sha1": "07db5cccbe455aa9d3741ce76e1254a714a4d0de"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-light.otf",
+      "sha1": "9bbfb53fa3a4004f6da5820bb2d3ea92135308bb"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-medium.otf",
+      "sha1": "cdedea75635f4ca94dc758b2c8022334b5bb1d6b"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-semibold.otf",
+      "sha1": "8e147d5a6d7902810cfae7d30b637c84f9e8315f"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-thin.otf",
+      "sha1": "1bac9bcddeb5bac4bbf3a86e2006351ead8e5b90"
+    },
+    {
+      "path": "src/assets/fonts/sf-ui-display-ultralight.otf",
+      "sha1": "554e2532435878343790ce55a0a877224548bee8"
     }
   ]
 }
