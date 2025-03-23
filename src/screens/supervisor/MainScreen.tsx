@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Alert,
   Pressable,
@@ -8,55 +8,51 @@ import {
   StyleSheet,
   Text,
   View,
-  Modal,
+  // Modal,
 } from 'react-native';
 import {useAuth, useFirestore} from '../../hooks';
 import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
+import {
+  ProfileIcon,
+  ShortLeftArrowIcon,
+  ShortRightArrowIcon,
+  StatisticIcon,
+} from '../../components/Icons';
+import dayjs from 'dayjs';
 
 const STATISTICS: {
-  id: string;
-  last_used: string;
-  level: number;
+  action: string;
+  phone_number: string;
+  timestamp: string;
   stamps: number;
 }[] = [
   {
-    id: 'user_123',
-    last_used: '2021-12-31',
-    level: 1,
-    stamps: 10,
+    // 스탬프 사용
+    action: 'stamp_used',
+    phone_number: '01065663684',
+    timestamp: '2021-12-31',
+    stamps: 1,
   },
   {
-    id: 'user_456',
-    last_used: '2021-12-31',
-    level: 2,
-    stamps: 20,
-  },
-  {
-    id: 'user_789',
-    last_used: '2021-12-31',
-    level: 3,
-    stamps: 30,
-  },
-  {
-    id: 'user_101',
-    last_used: '2021-12-31',
-    level: 4,
-    stamps: 40,
-  },
-  {
-    id: 'user_112',
-    last_used: '2021-12-31',
-    level: 5,
-    stamps: 50,
+    // 스탬프 적립
+    action: 'stamp_saved',
+    phone_number: '01065663684',
+    timestamp: '2021-12-31',
+    stamps: 1,
   },
 ];
 
 const MainScreen = ({navigation, route}: any) => {
   const {storeCode} = useAuth();
-  const {enterNumber, updateSession} = useFirestore();
+  const {enterNumber, getLogs} = useFirestore();
   const [modalVisible, setModalVisible] = useState(false);
+  const [date, setDate] = useState(dayjs());
+  const [logs, setLogs] = useState<Log[]>([]);
+
   const handleSearch = async () => {
+    Alert.alert('준비중', '고객조회 기능은 준비중입니다.');
+    return;
     await enterNumber(`session_${storeCode}`);
     setModalVisible(true);
   };
@@ -67,12 +63,34 @@ const MainScreen = ({navigation, route}: any) => {
     // navigation.navigate('Statistics');
   };
 
-  const handleCancel = () => {
-    setModalVisible(false);
-    updateSession(`session_${storeCode}`, {
-      mode: '',
-    });
+  // const handleCancel = () => {
+  //   setModalVisible(false);
+  //   updateSession(`session_${storeCode}`, {
+  //     mode: 'waiting',
+  //   });
+  // };
+
+  const handleDateMinusChange = (value: number) => {
+    setDate(date.subtract(value, 'day'));
   };
+
+  const handleDatePlusChange = (value: number) => {
+    setDate(date.add(value, 'day'));
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchLogs = async () => {
+        const dateString = date.format('YYYY-MM-DD');
+        console.log('fetchLogs', dateString);
+        const logs = await getLogs(dateString);
+        if (logs) {
+          setLogs(logs);
+        }
+      };
+      fetchLogs();
+    }, [date]),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -91,7 +109,7 @@ const MainScreen = ({navigation, route}: any) => {
 
           console.log(data);
           // phone이 있으면 화면 이동
-          if (data.phone !== '') {
+          if (data.phone !== '' && data.mode === 'onboarding') {
             setModalVisible(false);
             navigation.navigate('Detail', {phoneNumber: data.phone});
           }
@@ -111,26 +129,166 @@ const MainScreen = ({navigation, route}: any) => {
       />
       <SafeAreaView style={styles.backgroundStyle}>
         <View style={styles.innerContainer}>
-          <ScrollView style={styles.scrollView}>
-            {STATISTICS.map((statistic, index) => (
-              <View key={index} style={styles.listBox}>
-                <Text>{statistic.id}</Text>
-                <Text>{statistic.last_used}</Text>
-                <Text>{statistic.level}</Text>
-                <Text>{statistic.stamps}</Text>
+          <View
+            style={[
+              styles.flexRowBox,
+              {justifyContent: 'flex-end', marginBottom: 12},
+            ]}>
+            <View style={[styles.flexRowBox, {gap: 8}]}>
+              <Pressable style={styles.button} onPress={handleStatistics}>
+                <StatisticIcon width={24} height={24} />
+                <Text style={styles.buttonText}>통계</Text>
+              </Pressable>
+              <Pressable style={styles.button} onPress={handleSearch}>
+                <ProfileIcon width={24} height={24} />
+                <Text style={styles.buttonText}>고객조회</Text>
+              </Pressable>
+            </View>
+          </View>
+          <View
+            style={[
+              styles.innerContainer,
+              {
+                backgroundColor: 'white',
+                borderRadius: 20,
+                gap: 20,
+              },
+            ]}>
+            <View
+              style={[
+                styles.flexRowBox,
+                {justifyContent: 'space-between', paddingHorizontal: 12},
+              ]}>
+              <Text style={styles.titleText}>적립내역</Text>
+              <View
+                style={[
+                  styles.flexRowBox,
+                  {
+                    gap: 12,
+                  },
+                ]}>
+                <Pressable onPress={() => handleDateMinusChange(1)}>
+                  <ShortLeftArrowIcon />
+                </Pressable>
+                <Text
+                  style={{
+                    fontFamily: 'Pretendard-Medium',
+                    fontSize: 14,
+                    lineHeight: 22,
+                    letterSpacing: -1,
+                  }}>
+                  {date.format('MM월 DD일')}
+                </Text>
+                <Pressable onPress={() => handleDatePlusChange(1)}>
+                  <ShortRightArrowIcon />
+                </Pressable>
               </View>
-            ))}
-          </ScrollView>
-          <View style={styles.flexRowBox}>
-            <Pressable style={styles.button} onPress={handleSearch}>
-              <Text style={styles.buttonText}>조회하기</Text>
-            </Pressable>
-            <Pressable style={styles.button} onPress={handleStatistics}>
-              <Text style={styles.buttonText}>통계보기</Text>
-            </Pressable>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                paddingHorizontal: 12,
+              }}>
+              <View
+                style={[
+                  styles.flexRowBox,
+                  {
+                    justifyContent: 'space-between',
+                    height: 30,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#E5E5E5',
+                    gap: 16,
+                    marginBottom: 16,
+                  },
+                ]}>
+                <View
+                  style={[
+                    styles.flexRowBox,
+                    {justifyContent: 'flex-start', gap: 16, flex: 1},
+                  ]}>
+                  <Text
+                    style={{
+                      width: 51,
+                      color: '#9F9FA6',
+                    }}>
+                    적립정보
+                  </Text>
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: '#9F9FA6',
+                    }}>
+                    회원정보
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    width: 140,
+                    color: '#9F9FA6',
+                  }}>
+                  일시
+                </Text>
+              </View>
+              <ScrollView style={styles.scrollView}>
+                <View
+                  style={{display: 'flex', flexDirection: 'column', gap: 16}}>
+                  {logs.map((statistic, index) => (
+                    <View key={index} style={styles.listBox}>
+                      <View
+                        style={[
+                          styles.flexRowBox,
+                          {justifyContent: 'flex-start', gap: 16, flex: 1},
+                        ]}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 6,
+                            width: 51,
+                            height: 26,
+                            backgroundColor:
+                              statistic.action === 'stamp_saved'
+                                ? '#FFEBD7'
+                                : '#E8F1FF',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 12,
+                              lineHeight: 22,
+                              letterSpacing: -1,
+                              fontFamily: 'Pretendard-Semibold',
+                              color:
+                                statistic.action === 'stamp_saved'
+                                  ? '#FF8400'
+                                  : '#3F8CFF',
+                            }}>
+                            {statistic.action === 'stamp_saved'
+                              ? '적립'
+                              : '사용'}
+                          </Text>
+                        </View>
+                        <Text style={{color: '#1B2128'}}>
+                          {statistic.phone_number}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{
+                          width: 140,
+                          color: '#878B8F',
+                          fontSize: 12,
+                          lineHeight: 22,
+                        }}>
+                        {dayjs(statistic.timestamp).format('YYYY-MM-DD HH:mm')}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
           </View>
         </View>
-        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        {/* <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text style={styles.modalText}>번호를 입력하는 중이에요</Text>
@@ -139,7 +297,7 @@ const MainScreen = ({navigation, route}: any) => {
               </Pressable>
             </View>
           </View>
-        </Modal>
+        </Modal> */}
       </SafeAreaView>
     </View>
   );
@@ -151,37 +309,54 @@ const styles = StyleSheet.create({
   },
   backgroundStyle: {
     flex: 1,
+    backgroundColor: '#FFFAE3',
   },
   innerContainer: {
     flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
-    paddingTop: 30,
-    paddingBottom: 30,
+    paddingTop: 24,
+    paddingBottom: 24,
   },
-  scrollView: {},
+  flexColumnBox: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
   flexRowBox: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listBox: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 6,
+    alignItems: 'center',
+    gap: 16,
   },
   button: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#3D7BF7',
+    width: 112,
+    height: 40,
+    backgroundColor: 'white',
+    display: 'flex',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 8,
   },
   buttonText: {
-    color: 'white',
+    color: '#191D2B',
+    fontFamily: 'Pretendard-Semibold',
+    fontSize: 16,
+    lineHeight: 19,
+    letterSpacing: -1,
   },
   centeredView: {
     flex: 1,
@@ -221,6 +396,12 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  titleText: {
+    fontFamily: 'Pretendard-Semibold',
+    fontSize: 20,
+    lineHeight: 28,
+    letterSpacing: -1,
   },
 });
 
