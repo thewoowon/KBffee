@@ -32,7 +32,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Black.otf</string>
@@ -44,6 +44,14 @@
 		<string>Pretendard-Regular.otf</string>
 		<string>Pretendard-SemiBold.otf</string>
 		<string>Pretendard-Thin.otf</string>
+		<string>sf-ui-display-black.otf</string>
+		<string>sf-ui-display-bold.otf</string>
+		<string>sf-ui-display-heavy.otf</string>
+		<string>sf-ui-display-light.otf</string>
+		<string>sf-ui-display-medium.otf</string>
+		<string>sf-ui-display-semibold.otf</string>
+		<string>sf-ui-display-thin.otf</string>
+		<string>sf-ui-display-ultralight.otf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
