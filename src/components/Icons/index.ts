@@ -1,1 +1,10 @@
 export {default as LeftArrowIcon} from './LeftArrowIcon';
+export {default as CircleXIcon} from './CircleXIcon';
+export {default as XIcon} from './XIcon';
+export {default as CheckIcon} from './CheckIcon';
+export {default as StatisticIcon} from './StatisticIcon';
+export {default as ProfileIcon} from './ProfileIcon';
+export {default as CirclePlusIcon} from './CirclePlusIcon';
+export {default as CircleMinusIcon} from './CircleMinusIcon';
+export {default as ShortLeftArrowIcon} from './ShortLeftArrowIcon';
+export {default as ShortRightArrowIcon} from './ShortRightArrowIcon';
