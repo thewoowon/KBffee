@@ -24,7 +24,8 @@ interface Store {
 }
 
 interface Log {
-  action: string;
+  action: 'stamp_saved' | 'stamp_used';
   phone_number: string;
   timestamp: string;
+  stamp: number;
 }
