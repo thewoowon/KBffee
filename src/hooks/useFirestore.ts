@@ -5,6 +5,12 @@ import {
   setDoc,
   collection,
   updateDoc,
+  where,
+  getDocs,
+  query,
+  startAt,
+  endAt,
+  orderBy,
 } from '@react-native-firebase/firestore';
 
 const useFirestore = () => {
@@ -110,7 +116,59 @@ const useFirestore = () => {
     }
   }
 
-  return {addUser, getUser, updateUser, getStores, enterNumber, updateSession};
+  //
+  async function getLogs(date: string): Promise<Log[]> {
+    try {
+      // 예: date = '2025-02-01'
+      const db = getFirestore();
+      const logsRef = collection(db, 'logs');
+
+      const logsQuery = query(
+        logsRef,
+        orderBy('timestamp'),
+        startAt(date),
+        endAt(date + '\uf8ff'), // 유니코드 트릭으로 prefix 매칭
+      );
+
+      const querySnapshot = await getDocs(logsQuery);
+
+      console.log('Logs fetched successfully!');
+
+      const logs = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...(doc.data() as Log),
+      }));
+
+      console.log('Logs:', logs);
+
+      return logs;
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+      return [];
+    }
+  }
+
+  async function addLog(log: Log) {
+    try {
+      const db = getFirestore();
+      const logsRef = collection(db, 'logs');
+      await setDoc(doc(logsRef), log);
+      console.log('Log posted successfully!');
+    } catch (error) {
+      console.error('Error posting log:', error);
+    }
+  }
+
+  return {
+    addUser,
+    getUser,
+    updateUser,
+    getStores,
+    enterNumber,
+    updateSession,
+    addLog,
+    getLogs,
+  };
 };
 
 export default useFirestore;
