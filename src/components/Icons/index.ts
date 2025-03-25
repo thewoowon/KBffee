@@ -8,3 +8,4 @@ export {default as CirclePlusIcon} from './CirclePlusIcon';
 export {default as CircleMinusIcon} from './CircleMinusIcon';
 export {default as ShortLeftArrowIcon} from './ShortLeftArrowIcon';
 export {default as ShortRightArrowIcon} from './ShortRightArrowIcon';
+export {default as RefreshIcon} from './RefreshIcon';
