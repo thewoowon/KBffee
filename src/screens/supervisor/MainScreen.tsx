@@ -15,6 +15,7 @@ import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {
   ProfileIcon,
+  RefreshIcon,
   ShortLeftArrowIcon,
   ShortRightArrowIcon,
   StatisticIcon,
@@ -164,24 +165,47 @@ const MainScreen = ({navigation, route}: any) => {
                 style={[
                   styles.flexRowBox,
                   {
-                    gap: 12,
+                    gap: 18,
                   },
                 ]}>
-                <Pressable onPress={() => handleDateMinusChange(1)}>
-                  <ShortLeftArrowIcon />
+                <Pressable
+                  onPress={() => setDate(dayjs())}
+                  style={[
+                    styles.flexRowBox,
+                    {
+                      backgroundColor: '#F3F3F3',
+                      width: 61,
+                      height: 26,
+                      borderRadius: 6,
+                      gap: 2,
+                    },
+                  ]}>
+                  <RefreshIcon width={12} height={12} />
+                  <Text>오늘</Text>
                 </Pressable>
-                <Text
-                  style={{
-                    fontFamily: 'Pretendard-Medium',
-                    fontSize: 14,
-                    lineHeight: 22,
-                    letterSpacing: -1,
-                  }}>
-                  {date.format('MM월 DD일')}
-                </Text>
-                <Pressable onPress={() => handleDatePlusChange(1)}>
-                  <ShortRightArrowIcon />
-                </Pressable>
+                <View
+                  style={[
+                    styles.flexRowBox,
+                    {
+                      gap: 12,
+                    },
+                  ]}>
+                  <Pressable onPress={() => handleDateMinusChange(1)}>
+                    <ShortLeftArrowIcon />
+                  </Pressable>
+                  <Text
+                    style={{
+                      fontFamily: 'Pretendard-Medium',
+                      fontSize: 14,
+                      lineHeight: 22,
+                      letterSpacing: -1,
+                    }}>
+                    {date.format('MM월 DD일')}
+                  </Text>
+                  <Pressable onPress={() => handleDatePlusChange(1)}>
+                    <ShortRightArrowIcon />
+                  </Pressable>
+                </View>
               </View>
             </View>
             <View
