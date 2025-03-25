@@ -51,7 +51,7 @@ const BALL_POSITIONS: {
 const DashboardScreen = ({navigation, route}: any) => {
   const phoneNumber = route.params?.phoneNumber;
   const {storeCode} = useAuth();
-  const [timeLeft, setTimeLeft] = useState(1000);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [user, setUser] = useState<User | null>(null);
   const [prevUser, setPrevUser] = useState<User | null>(null);
 
@@ -136,7 +136,7 @@ const DashboardScreen = ({navigation, route}: any) => {
             // 이전 사용자 정보가 있을 때
             if (userRef.current.stamps !== data.stamps) {
               // 스탬프 사용 시
-              setTimeLeft(5); // 5초 후 화면 종료
+              setTimeLeft(3); // 3초 후 화면 종료
             }
           }
 
