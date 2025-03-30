@@ -21,6 +21,7 @@ import {
   StatisticIcon,
 } from '../../components/Icons';
 import dayjs from 'dayjs';
+import {BackgroundDeco} from '../../components/background';
 
 const STATISTICS: {
   action: string;
@@ -323,6 +324,7 @@ const MainScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </Modal> */}
+        <BackgroundDeco backgroundColor="#FFFAE3" />
       </SafeAreaView>
     </View>
   );
@@ -334,7 +336,6 @@ const styles = StyleSheet.create({
   },
   backgroundStyle: {
     flex: 1,
-    backgroundColor: '#FFFAE3',
   },
   innerContainer: {
     flex: 1,

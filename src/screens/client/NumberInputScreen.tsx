@@ -20,6 +20,7 @@ import {
   XIcon,
 } from '../../components/Icons';
 import LinearGradient from 'react-native-linear-gradient';
+import {BackgroundDeco} from '../../components/background';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -474,40 +475,7 @@ const NumberInputScreen = ({navigation}: any) => {
             </View>
           </View>
         </Modal>
-        <View
-          style={[
-            styles.decoCircle,
-            {
-              top: -30,
-              right: 50,
-            },
-          ]}></View>
-        <View
-          style={[
-            styles.decoCircle,
-            {
-              bottom: -250,
-              left: 87,
-            },
-          ]}></View>
-        <View
-          style={[
-            styles.decoCircle,
-            {
-              backgroundColor: '#FFBED4',
-              right: 94,
-              bottom: -250,
-            },
-          ]}></View>
-        <View
-          style={[
-            styles.decoCircle,
-            {
-              backgroundColor: '#FFBED4',
-              right: 300,
-              bottom: -60,
-            },
-          ]}></View>
+        <BackgroundDeco />
       </SafeAreaView>
     </View>
   );
@@ -714,15 +682,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontFamily: 'Pretendard-Regular',
     color: '#191D2B',
-  },
-  decoCircle: {
-    width: 450,
-    height: 450,
-    borderRadius: 225,
-    backgroundColor: '#FFF5C5',
-    position: 'absolute',
-    opacity: 0.1,
-    zIndex: -1,
   },
 });
 

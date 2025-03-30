@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import {useAuth, useFirestore} from '../../hooks';
+import {BackgroundDeco} from '../../components/background';
 
 const SignInScreen = ({navigation, route}: any) => {
   const mode = route.params?.mode;
@@ -89,6 +90,7 @@ const SignInScreen = ({navigation, route}: any) => {
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
+        <BackgroundDeco />
       </SafeAreaView>
     </View>
   );
@@ -166,6 +168,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     textAlign: 'center',
     fontSize: 20,
+    backgroundColor: 'white',
   },
   confirmButton: {
     display: 'flex',

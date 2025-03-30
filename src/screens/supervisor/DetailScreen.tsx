@@ -24,6 +24,7 @@ import {
   LeftArrowIcon,
 } from '../../components/Icons';
 import LinearGradient from 'react-native-linear-gradient';
+import {BackgroundDeco} from '../../components/background';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -612,6 +613,7 @@ const DetailScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </Modal> */}
+        <BackgroundDeco />
       </SafeAreaView>
     </View>
   );

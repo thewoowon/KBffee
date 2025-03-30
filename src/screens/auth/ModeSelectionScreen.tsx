@@ -7,6 +7,8 @@ import {
   View,
   Pressable,
 } from 'react-native';
+import {ProfileIcon, StatisticIcon} from '../../components/Icons';
+import {BackgroundDeco} from '../../components/background';
 
 const ModeSelectionScreen = ({navigation, route}: any) => {
   const handleSignIn = (mode: 'supervisor' | 'client') => {
@@ -23,22 +25,38 @@ const ModeSelectionScreen = ({navigation, route}: any) => {
       <SafeAreaView style={styles.backgroundStyle}>
         <View style={styles.wrapper}>
           <View style={styles.flexBox}>
-            <Pressable
-              style={styles.modeContainer}
-              onPress={() => {
-                handleSignIn('supervisor');
-              }}>
-              <Text style={styles.buttonText}>관리자로 접속하기</Text>
-            </Pressable>
-            <Pressable
-              style={styles.modeContainer}
-              onPress={() => {
-                handleSignIn('client');
-              }}>
-              <Text style={styles.buttonText}>고객으로 접속하기</Text>
-            </Pressable>
+            <View>
+              <Text
+                style={{
+                  fontSize: 24,
+                  fontFamily: 'Pretendard-SemiBold',
+                  lineHeight: 32,
+                  letterSpacing: 1,
+                }}>
+                모드를 선택해주세요
+              </Text>
+            </View>
+            <View style={styles.flexBoxRow}>
+              <Pressable
+                style={styles.modeContainer}
+                onPress={() => {
+                  handleSignIn('supervisor');
+                }}>
+                <StatisticIcon />
+                <Text style={styles.buttonText}>관리자 모드</Text>
+              </Pressable>
+              <Pressable
+                style={styles.modeContainer}
+                onPress={() => {
+                  handleSignIn('client');
+                }}>
+                <ProfileIcon />
+                <Text style={styles.buttonText}>고객 모드</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
+        <BackgroundDeco />
       </SafeAreaView>
     </View>
   );
@@ -58,13 +76,20 @@ const styles = StyleSheet.create({
   },
   flexBox: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 33,
+  },
+  flexBoxRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 20,
+    gap: 16,
   },
   modeContainer: {
     width: 391,
+    gap: 5,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -83,7 +108,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#191D2B',
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: 'Pretendard-SemiBold',
   },
 });

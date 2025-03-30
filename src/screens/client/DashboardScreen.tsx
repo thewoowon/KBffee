@@ -13,6 +13,7 @@ import {getFirestore, doc, onSnapshot} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {LeftArrowIcon} from '../../components/Icons';
 import {AnimatedBall} from '../../components/decorations';
+import {BackgroundDeco} from '../../components/background';
 
 // 총 13개까지
 const BALL_POSITIONS: {
@@ -431,6 +432,7 @@ const DashboardScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </View>
+        <BackgroundDeco />
       </SafeAreaView>
     </View>
   );
