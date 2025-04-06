@@ -1,32 +1,73 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 
 type MyCustomToastProps = {
   text1: string;
+  text2?: string;
+  onPress?: () => void;
   props: any;
 };
 
-const MyCustomToast = ({text1, props}: MyCustomToastProps) => (
+const MyCustomToast = ({
+  text1,
+  text2,
+  onPress,
+  ...props
+}: MyCustomToastProps) => (
   <View style={styles.customToastContainer}>
-    <Text style={styles.customText}>{text1}</Text>
+    <View>
+      <Text style={styles.customSubtitleText}>고객번호 {text2}</Text>
+      <Text style={styles.customTitleText}>{text1}</Text>
+    </View>
+    <Pressable
+      onPress={onPress}
+      style={styles.buttonContainer}
+      android_ripple={{color: '#FFFFFF', radius: 20}}>
+      <Text style={styles.buttonText}>돌아가기</Text>
+    </Pressable>
   </View>
 );
 
 const styles = StyleSheet.create({
   customToastContainer: {
-    backgroundColor: 'rgba(31, 31, 31, 0.4)',
-    paddingTop: 12,
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingBottom: 14,
-    borderRadius: 7,
-    marginLeft: 20,
-    marginRight: 20,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FE7901',
+    width: '95%',
+    height: 98,
+    borderRadius: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
-  customText: {
+  customTitleText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 24,
+    fontFamily: 'Pretendard-Medium',
+    lineHeight: 32,
+    letterSpacing: -1,
+  },
+  customSubtitleText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'Pretendard-Medium',
+    lineHeight: 26,
+    letterSpacing: -1,
+  },
+  buttonContainer: {
+    backgroundColor: '#F2F2F2',
+    width: 86,
+    height: 32,
+    borderRadius: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#4E5056',
+    fontSize: 16,
     fontFamily: 'Pretendard-Regular',
-    lineHeight: 20,
+    lineHeight: 26,
+    letterSpacing: -1,
   },
 });
 
