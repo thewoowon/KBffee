@@ -84,6 +84,7 @@ const DetailScreen = ({navigation, route}: any) => {
       phone_number: phoneNumber,
       stamp: numberValue,
       timestamp: Timestamp.now(),
+      note: '',
     });
 
     setNumber('');
@@ -122,6 +123,7 @@ const DetailScreen = ({navigation, route}: any) => {
       phone_number: phoneNumber,
       stamp: numberValue,
       timestamp: Timestamp.now(),
+      note: '',
     });
 
     setNumber('');
@@ -372,7 +374,7 @@ const DetailScreen = ({navigation, route}: any) => {
                     style={{
                       fontSize: 24,
                       lineHeight: 32,
-                      fontFamily: 'Prentendard-Seimbold',
+                      fontFamily: 'Prentendard-Semibold',
                       color: '#191D2B',
                     }}>
                     {user.stamps}개

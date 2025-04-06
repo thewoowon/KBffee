@@ -1,6 +1,7 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   Alert,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -18,39 +19,24 @@ import {
   RefreshIcon,
   ShortLeftArrowIcon,
   ShortRightArrowIcon,
-  StatisticIcon,
 } from '../../components/Icons';
 import dayjs from 'dayjs';
 import {BackgroundDeco} from '../../components/background';
-
-const STATISTICS: {
-  action: string;
-  phone_number: string;
-  timestamp: string;
-  stamps: number;
-}[] = [
-  {
-    // 스탬프 사용
-    action: 'stamp_used',
-    phone_number: '01065663684',
-    timestamp: '2021-12-31',
-    stamps: 1,
-  },
-  {
-    // 스탬프 적립
-    action: 'stamp_saved',
-    phone_number: '01065663684',
-    timestamp: '2021-12-31',
-    stamps: 1,
-  },
-];
+import DetailView from './DetailView';
 
 const MainScreen = ({navigation, route}: any) => {
   const {storeCode} = useAuth();
   const {enterNumber, getLogs} = useFirestore();
+  const {setIsAuthenticated, initStoreCode} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [date, setDate] = useState(dayjs());
   const [logs, setLogs] = useState<Log[]>([]);
+  const [phoneNumber, setPhoneNumber] = useState('');
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    initStoreCode('');
+  };
 
   const handleSearch = async () => {
     Alert.alert('준비중', '고객조회 기능은 준비중입니다.');
@@ -65,13 +51,6 @@ const MainScreen = ({navigation, route}: any) => {
     // navigation.navigate('Statistics');
   };
 
-  // const handleCancel = () => {
-  //   setModalVisible(false);
-  //   updateSession(`session_${storeCode}`, {
-  //     mode: 'waiting',
-  //   });
-  // };
-
   const handleDateMinusChange = (value: number) => {
     setDate(date.subtract(value, 'day'));
   };
@@ -80,11 +59,19 @@ const MainScreen = ({navigation, route}: any) => {
     setDate(date.add(value, 'day'));
   };
 
+  const updateLogs = async () => {
+    const dateString = date.format('YYYY-MM-DD');
+    console.log('updateLogs', dateString);
+    const logs = await getLogs(dateString);
+    if (logs) {
+      setLogs(logs);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       const fetchLogs = async () => {
         const dateString = date.format('YYYY-MM-DD');
-        console.log('fetchLogs', dateString);
         const logs = await getLogs(dateString);
         if (logs) {
           setLogs(logs);
@@ -96,7 +83,6 @@ const MainScreen = ({navigation, route}: any) => {
 
   useFocusEffect(
     useCallback(() => {
-      // session -> phone
       const db = getFirestore();
       const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
 
@@ -109,18 +95,19 @@ const MainScreen = ({navigation, route}: any) => {
             return;
           }
 
-          console.log(data);
-          // phone이 있으면 화면 이동
+          setPhoneNumber(data.phone);
           if (data.phone !== '' && data.mode === 'onboarding') {
+            setModalVisible(true);
+          } else {
+            //
             setModalVisible(false);
-            navigation.navigate('Detail', {phoneNumber: data.phone});
           }
         }
       });
 
       return () => unsubscribe();
     }, [storeCode]),
-  ); // ✅ 의존성 배열 `[]` → 최초 1회 실행
+  );
 
   return (
     <View style={styles.container}>
@@ -137,13 +124,17 @@ const MainScreen = ({navigation, route}: any) => {
               {justifyContent: 'flex-end', marginBottom: 12},
             ]}>
             <View style={[styles.flexRowBox, {gap: 8}]}>
-              <Pressable style={styles.button} onPress={handleStatistics}>
+              {/* <Pressable style={styles.button} onPress={handleStatistics}>
                 <StatisticIcon width={24} height={24} />
                 <Text style={styles.buttonText}>통계</Text>
               </Pressable>
               <Pressable style={styles.button} onPress={handleSearch}>
                 <ProfileIcon width={24} height={24} />
                 <Text style={styles.buttonText}>고객조회</Text>
+              </Pressable> */}
+              <Pressable style={styles.button} onPress={handleLogout}>
+                <Text style={styles.buttonText}>로그아웃</Text>
+                <ProfileIcon width={20} height={20} />
               </Pressable>
             </View>
           </View>
@@ -175,14 +166,23 @@ const MainScreen = ({navigation, route}: any) => {
                     styles.flexRowBox,
                     {
                       backgroundColor: '#F3F3F3',
-                      width: 61,
-                      height: 26,
+                      width: 70,
+                      height: 32,
                       borderRadius: 6,
-                      gap: 2,
+                      gap: 4,
                     },
                   ]}>
-                  <RefreshIcon width={12} height={12} />
-                  <Text>오늘</Text>
+                  <RefreshIcon width={16} height={16} />
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      lineHeight: 26,
+                      letterSpacing: -1,
+                      fontFamily: 'Pretendard-Medium',
+                      color: '#595959',
+                    }}>
+                    오늘
+                  </Text>
                 </Pressable>
                 <View
                   style={[
@@ -192,19 +192,19 @@ const MainScreen = ({navigation, route}: any) => {
                     },
                   ]}>
                   <Pressable onPress={() => handleDateMinusChange(1)}>
-                    <ShortLeftArrowIcon />
+                    <ShortLeftArrowIcon width={24} height={24} />
                   </Pressable>
                   <Text
                     style={{
                       fontFamily: 'Pretendard-Medium',
-                      fontSize: 14,
-                      lineHeight: 22,
+                      fontSize: 16,
+                      lineHeight: 26,
                       letterSpacing: -1,
                     }}>
                     {date.format('MM월 DD일')}
                   </Text>
                   <Pressable onPress={() => handleDatePlusChange(1)}>
-                    <ShortRightArrowIcon />
+                    <ShortRightArrowIcon width={24} height={24} />
                   </Pressable>
                 </View>
               </View>
@@ -233,21 +233,44 @@ const MainScreen = ({navigation, route}: any) => {
                   ]}>
                   <Text
                     style={{
-                      width: 51,
+                      fontFamily: 'Pretendard-Medium',
+                      fontSize: 14,
+                      lineHeight: 24,
+                      letterSpacing: -1,
+                      width: 62,
                       color: '#9F9FA6',
                     }}>
                     적립정보
                   </Text>
                   <Text
                     style={{
+                      fontFamily: 'Pretendard-Medium',
+                      fontSize: 14,
+                      lineHeight: 24,
+                      letterSpacing: -1,
                       flex: 1,
                       color: '#9F9FA6',
                     }}>
                     회원정보
                   </Text>
+                  <Text
+                    style={{
+                      fontFamily: 'Pretendard-Medium',
+                      fontSize: 14,
+                      lineHeight: 24,
+                      letterSpacing: -1,
+                      flex: 1,
+                      color: '#9F9FA6',
+                    }}>
+                    비고
+                  </Text>
                 </View>
                 <Text
                   style={{
+                    fontFamily: 'Pretendard-Medium',
+                    fontSize: 14,
+                    lineHeight: 24,
+                    letterSpacing: -1,
                     width: 120,
                     color: '#9F9FA6',
                   }}>
@@ -257,73 +280,115 @@ const MainScreen = ({navigation, route}: any) => {
               <ScrollView style={styles.scrollView}>
                 <View
                   style={{display: 'flex', flexDirection: 'column', gap: 16}}>
-                  {logs.map((statistic, index) => (
-                    <View key={index} style={styles.listBox}>
-                      <View
-                        style={[
-                          styles.flexRowBox,
-                          {justifyContent: 'flex-start', gap: 16, flex: 1},
-                        ]}>
+                  {logs.length > 0 ? (
+                    logs.map((statistic, index) => (
+                      <View key={index} style={styles.listBox}>
                         <View
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRadius: 6,
-                            width: 51,
-                            height: 26,
-                            backgroundColor:
-                              statistic.action === 'stamp_saved'
-                                ? '#FFEBD7'
-                                : '#E8F1FF',
-                          }}>
+                          style={[
+                            styles.flexRowBox,
+                            {justifyContent: 'flex-start', gap: 16, flex: 1},
+                          ]}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              borderRadius: 6,
+                              width: 62,
+                              height: 32,
+                              backgroundColor:
+                                statistic.action === 'stamp_saved'
+                                  ? '#FFEBD7'
+                                  : '#E8F1FF',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 14,
+                                lineHeight: 24,
+                                letterSpacing: -1,
+                                fontFamily: 'Pretendard-Medium',
+                                color:
+                                  statistic.action === 'stamp_saved'
+                                    ? '#FF8400'
+                                    : '#3F8CFF',
+                              }}>
+                              {statistic.action === 'stamp_saved'
+                                ? '적립'
+                                : '사용'}{' '}
+                              {statistic.stamp}
+                            </Text>
+                          </View>
                           <Text
                             style={{
-                              fontSize: 12,
-                              lineHeight: 22,
+                              color: '#1B2128',
+                              fontSize: 14,
+                              lineHeight: 24,
                               letterSpacing: -1,
-                              fontFamily: 'Pretendard-Semibold',
-                              color:
-                                statistic.action === 'stamp_saved'
-                                  ? '#FF8400'
-                                  : '#3F8CFF',
+                              fontFamily: 'Pretendard-Medium',
                             }}>
-                            {statistic.action === 'stamp_saved'
-                              ? '적립'
-                              : '사용'}{' '}
-                            {statistic.stamp}
+                            {
+                              // 3자리 , 4자리 ,4자리
+                              statistic.phone_number.replace(
+                                /(\d{3})(\d{4})(\d{4})/,
+                                '$1-$2-$3',
+                              )
+                            }
+                          </Text>
+                          <Text
+                            style={{
+                              color: 'black',
+                              fontSize: 14,
+                              lineHeight: 24,
+                              letterSpacing: -1,
+                              fontFamily: 'Pretendard-Light',
+                            }}>
+                            {statistic.note}
                           </Text>
                         </View>
-                        <Text style={{color: '#1B2128'}}>
-                          {statistic.phone_number}
+                        <Text
+                          style={{
+                            width: 120,
+                            color: '#878B8F',
+                            fontSize: 14,
+                            lineHeight: 24,
+                            letterSpacing: -1,
+                          }}>
+                          {dayjs(statistic.timestamp).format(
+                            'YYYY-MM-DD HH:mm',
+                          )}
                         </Text>
                       </View>
-                      <Text
-                        style={{
-                          width: 120,
-                          color: '#878B8F',
-                          fontSize: 12,
-                          lineHeight: 22,
-                        }}>
-                        {dayjs(statistic.timestamp).format('YYYY-MM-DD HH:mm')}
-                      </Text>
+                    ))
+                  ) : (
+                    <View
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: 250,
+                      }}>
+                      <Text style={styles.emptyText}>적립내역이 없습니다.</Text>
                     </View>
-                  ))}
+                  )}
                 </View>
               </ScrollView>
             </View>
           </View>
         </View>
-        {/* <Modal animationType="slide" transparent={true} visible={modalVisible}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>번호를 입력하는 중이에요</Text>
-              <Pressable style={[styles.buttonClose]} onPress={handleCancel}>
-                <Text style={styles.textStyle}>번호 입력 취소</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal> */}
+        <Modal
+          style={{}}
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}>
+          <DetailView
+            navigation={navigation}
+            phoneNumber={phoneNumber}
+            onClose={() => {
+              setModalVisible(false);
+            }}
+            updateLogs={updateLogs}
+          />
+        </Modal>
         <BackgroundDeco backgroundColor="#FFFAE3" />
       </SafeAreaView>
     </View>
@@ -376,12 +441,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
+    gap: 6,
   },
   buttonText: {
     color: '#191D2B',
-    fontFamily: 'Pretendard-Semibold',
+    fontFamily: 'Pretendard-Medium',
     fontSize: 16,
-    lineHeight: 19,
+    lineHeight: 26,
     letterSpacing: -1,
   },
   centeredView: {
@@ -425,8 +491,15 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: 'Pretendard-Semibold',
-    fontSize: 20,
-    lineHeight: 28,
+    fontSize: 24,
+    lineHeight: 32,
+    letterSpacing: -1,
+  },
+  emptyText: {
+    color: '#93989E',
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 14,
+    lineHeight: 19,
     letterSpacing: -1,
   },
 });

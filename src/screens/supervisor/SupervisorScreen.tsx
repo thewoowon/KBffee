@@ -12,11 +12,11 @@ const SupervisorStack = () => (
       component={MainScreen}
       options={{headerShown: false}}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="Detail"
       component={DetailScreen}
       options={{headerShown: false}}
-    />
+    /> */}
     <Stack.Screen
       name="Statistics"
       component={StatisticsScreen}
