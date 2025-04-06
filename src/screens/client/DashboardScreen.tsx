@@ -11,7 +11,11 @@ import {
 import {useAuth, useFirestore} from '../../hooks';
 import {getFirestore, doc, onSnapshot} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
-import {LeftArrowIcon} from '../../components/Icons';
+import {
+  AmericanoIcon,
+  BeverageIcon,
+  LeftArrowIcon,
+} from '../../components/Icons';
 import {AnimatedBall} from '../../components/decorations';
 import {BackgroundDeco} from '../../components/background';
 
@@ -28,25 +32,25 @@ const BALL_POSITIONS: {
   zIndex: number;
 }[] = [
   {
-    position: {bottom: -4, left: -49},
+    position: {bottom: -4, left: -59},
     color: '#FF515D',
-    size: 117,
+    size: 140,
     zIndex: 1,
   }, // 1
-  {position: {bottom: -85, left: 19}, color: '#86AEFE', size: 117, zIndex: 6}, // 2
-  {position: {bottom: -26, left: 109}, color: '#9165DD', size: 117, zIndex: 5}, // 3
-  {position: {bottom: -38, left: 181}, color: '#FFAE62', size: 117, zIndex: 3}, // 4
-  {position: {bottom: -20, right: -25}, color: '#5DB0EB', size: 117, zIndex: 4}, // 5
+  {position: {bottom: -100, left: 23}, color: '#86AEFE', size: 140, zIndex: 6}, // 2
+  {position: {bottom: -30, left: 131}, color: '#9165DD', size: 140, zIndex: 5}, // 3
+  {position: {bottom: -44, left: 219}, color: '#FFAE62', size: 140, zIndex: 3}, // 4
+  {position: {bottom: -23, right: -32}, color: '#5DB0EB', size: 140, zIndex: 4}, // 5
 
-  {position: {bottom: 70, left: -44}, color: '#67B265', size: 117, zIndex: 6}, // 6
-  {position: {bottom: 11, left: 34}, color: '#FFB2F6', size: 117, zIndex: 13}, // 7
-  {position: {bottom: 50, left: 131}, color: '#FFF0A8', size: 117, zIndex: 1}, // 8
-  {position: {bottom: 70, right: 7}, color: '#67B265', size: 117, zIndex: 5}, // 9
-  {position: {bottom: 133, left: -40}, color: '#FFF0A8', size: 117, zIndex: 4}, // 10
+  {position: {bottom: 85, left: -53}, color: '#67B265', size: 140, zIndex: 6}, // 6
+  {position: {bottom: 15, left: 41}, color: '#FFB2F6', size: 140, zIndex: 13}, // 7
+  {position: {bottom: 62, left: 158}, color: '#FFF0A8', size: 140, zIndex: 1}, // 8
+  {position: {bottom: 85, right: 7}, color: '#67B265', size: 140, zIndex: 5}, // 9
+  {position: {bottom: 161, left: -48}, color: '#FFF0A8', size: 140, zIndex: 4}, // 10
 
-  {position: {bottom: 112, left: 59}, color: '#5DB0EB', size: 117, zIndex: 5}, // 11
-  {position: {bottom: 123, left: 142}, color: '#FFAE62', size: 117, zIndex: 1}, // 12
-  {position: {bottom: 160, right: -39}, color: '#FF515D', size: 117, zIndex: 1}, // 13
+  {position: {bottom: 136, left: 70}, color: '#5DB0EB', size: 140, zIndex: 5}, // 11
+  {position: {bottom: 123, left: 172}, color: '#FFAE62', size: 140, zIndex: 1}, // 12
+  {position: {bottom: 193, right: -49}, color: '#FF515D', size: 140, zIndex: 1}, // 13
 ];
 
 const DashboardScreen = ({navigation, route}: any) => {
@@ -120,10 +124,6 @@ const DashboardScreen = ({navigation, route}: any) => {
             console.log('No data found');
             return;
           }
-          console.log('User data: ', data);
-
-          console.log('user', userRef.current);
-          console.log('prevUser', prevUserRef.current);
 
           if (!userRef.current && !prevUserRef.current) {
             // 최초 사용자 정보가 없을 때, 이전 사용자 정보가 없을 때 -> 최초 사용자 정보 저장
@@ -141,15 +141,7 @@ const DashboardScreen = ({navigation, route}: any) => {
             }
           }
 
-          // 여기서 이전 사용자 정보를 저장해야 하기 때문에
-
-          // 이전 사용자 정보 저장
-          console.log('이전 사용자 정보 저장');
-          console.log('prevUser', userRef.current);
           setPrevUser(userRef.current);
-          // 사용자 정보 업데이트
-          console.log('사용자 정보 업데이트');
-          console.log('user', data);
           setUser(data as User);
         }
       });
@@ -173,7 +165,6 @@ const DashboardScreen = ({navigation, route}: any) => {
           }
           if (data.phone === '' && data.mode === 'waiting') {
             console.log('초기화면으로 이동');
-            // 전화번호 입력 UI로 변경하는 코드 실행
             navigation.navigate('NumberInput');
           }
         }
@@ -239,7 +230,7 @@ const DashboardScreen = ({navigation, route}: any) => {
                   {
                     height: 'auto',
                     gap: 39,
-                    width: 340,
+                    width: 424,
                     alignItems: 'flex-start',
                     justifyContent: 'flex-start',
                     paddingTop: 104,
@@ -295,7 +286,7 @@ const DashboardScreen = ({navigation, route}: any) => {
                   {
                     height: 'auto',
                     gap: 58,
-                    width: 340,
+                    width: 424,
                     alignItems: 'flex-start',
                     justifyContent: 'flex-start',
                     paddingTop: 28,
@@ -307,10 +298,11 @@ const DashboardScreen = ({navigation, route}: any) => {
                   </Pressable>
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: 20,
                       fontFamily: 'Pretendard-Regular',
                       color: '#191D2B',
-                      lineHeight: 19,
+                      lineHeight: 28,
+                      letterSpacing: -1,
                     }}>
                     뒤로가기
                   </Text>
@@ -348,6 +340,52 @@ const DashboardScreen = ({navigation, route}: any) => {
                     </Text>
                   )}
                 </View>
+                <View style={styles.beverageWrapper}>
+                  {user && user.stamps > 19 && (
+                    <View style={styles.beverageBox}>
+                      <View>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: 4,
+                            alignItems: 'center',
+                          }}>
+                          <BeverageIcon />
+                          <Text style={styles.beverageTitleText}>
+                            조제음료 {Math.floor(user.stamps / 20)}잔 무료로
+                            사용 가능해요!
+                          </Text>
+                        </View>
+                        <Text style={styles.beverageBodyText}>
+                          스탬프 20개 소진
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                  {user && user.stamps > 9 && (
+                    <View style={styles.beverageBox}>
+                      <View>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: 4,
+                            alignItems: 'center',
+                          }}>
+                          <AmericanoIcon />
+                          <Text style={styles.beverageTitleText}>
+                            아메리카노 {Math.floor(user.stamps / 10)}잔 무료로
+                            사용 가능해요!
+                          </Text>
+                        </View>
+                        <Text style={styles.beverageBodyText}>
+                          스탬프 10개 소진
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                </View>
               </View>
             )}
 
@@ -355,8 +393,8 @@ const DashboardScreen = ({navigation, route}: any) => {
               style={[
                 {
                   borderRadius: 35,
-                  width: 350,
-                  height: 450,
+                  width: 420,
+                  height: 552,
                   backgroundColor: '#ffffff',
                   shadowColor: '#000000',
                   shadowOffset: {
@@ -372,9 +410,9 @@ const DashboardScreen = ({navigation, route}: any) => {
               <View
                 style={{
                   flex: 1,
-                  paddingTop: 49,
-                  paddingLeft: 32,
-                  paddingRight: 32,
+                  paddingTop: 59,
+                  paddingLeft: 37,
+                  paddingRight: 37,
                   paddingBottom: 28,
                   display: 'flex',
                   flexDirection: 'column',
@@ -478,26 +516,64 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   labelTitleText: {
-    fontSize: 28,
-    fontFamily: 'Pretendard-Semibold',
-    lineHeight: 38,
+    fontSize: 32,
+    fontFamily: 'Pretendard-Medium',
+    lineHeight: 45,
+    letterSpacing: -1,
   },
   labelSubText: {
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: 'Pretendard-Regular',
-    lineHeight: 24,
+    lineHeight: 28,
+    letterSpacing: -1,
   },
   stampLeftText: {
-    fontSize: 64,
-    fontFamily: 'Pretendard-Semibold',
-    lineHeight: 72,
-    letterSpacing: -2,
+    fontSize: 76,
+    fontFamily: 'Pretendard-Medium',
+    lineHeight: 86,
+    letterSpacing: -1,
     color: '#FD5F01',
   },
   stampRightText: {
+    fontSize: 28,
+    fontFamily: 'Pretendard-Medium',
+    lineHeight: 38,
+    letterSpacing: -1,
+  },
+  beverageWrapper: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginTop: 40,
+  },
+  beverageBox: {
+    width: '100%',
+    height: 98,
+    backgroundColor: '#FF8400',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 16,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  beverageTitleText: {
     fontSize: 24,
-    fontFamily: 'Pretendard-Semibold',
     lineHeight: 32,
+    fontFamily: 'Pretendard-Medium',
+    color: '#ffffff',
+    letterSpacing: -1,
+  },
+  beverageBodyText: {
+    fontSize: 16,
+    lineHeight: 26,
+    fontFamily: 'Pretendard-Regular',
+    color: '#ffffff',
+    letterSpacing: -1,
   },
 });
 

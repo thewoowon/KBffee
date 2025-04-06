@@ -75,6 +75,7 @@ const NumberInputScreen = ({navigation}: any) => {
       // 고객인 핸드폰 번호를 입력하고 -> 적립 상황판으로 이동하는
       mode: 'onboarding',
     });
+    console.log('onboarding');
     navigation.navigate('Dashboard', {phoneNumber});
     setNumber('');
   };
@@ -161,7 +162,7 @@ const NumberInputScreen = ({navigation}: any) => {
                   width: 340,
                   alignItems: 'flex-start',
                   justifyContent: 'flex-start',
-                  paddingTop: 54,
+                  paddingTop: 67,
                 },
               ]}>
               <View style={styles.labelBox}>
@@ -182,138 +183,142 @@ const NumberInputScreen = ({navigation}: any) => {
               style={[
                 styles.flexColumnBox,
                 {
-                  paddingTop: 47.5,
+                  paddingTop: 24,
                   paddingLeft: 15,
                   paddingRight: 15,
-                  paddingBottom: 28,
                   borderRadius: 35,
-                  width: 350,
-                  height: 450,
+                  width: 420,
+                  height: 552,
                   backgroundColor: '#ffffff',
-                  shadowColor: '#000000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 4.5,
-                  },
-                  shadowOpacity: 0.07,
-                  shadowRadius: 22,
-                  elevation: 6,
                 },
               ]}>
               <View
                 style={[
                   styles.flexColumnBox,
                   {
-                    paddingLeft: 10,
-                    paddingRight: 10,
-                    paddingBottom: 10,
+                    width: 320,
+                    height: 'auto',
                   },
                 ]}>
                 <View
                   style={[
-                    styles.flexColumnBox,
                     {
-                      flex: 1,
-                      paddingLeft: 10,
-                      paddingRight: 10,
-                      paddingBottom: 10,
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'flex-start',
+                      gap: 10,
+                      marginBottom: 20,
+                      paddingLeft: 9,
+                      paddingRight: 9,
                     },
                   ]}>
                   <View
                     style={[
+                      styles.headerNumberContainer,
                       {
-                        width: 266,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'flex-start',
-                        gap: 10,
-                        marginBottom: 25,
-                        paddingLeft: 6.75,
-                        paddingRight: 6.75,
+                        width: '100%',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                       },
                     ]}>
-                    <View
-                      style={[
-                        styles.headerNumberContainer,
-                        {
-                          width: '100%',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        },
-                      ]}>
-                      <View style={styles.headerNumberContainer}>
-                        <Text style={styles.headerNumberText}>010</Text>
-                        <Text style={styles.headerNumberText}>
-                          {phoneNumberLabel()}
-                        </Text>
-                      </View>
-                      {number.length > 0 && (
-                        <Pressable
-                          onPress={() => {
-                            setNumber('');
-                          }}>
-                          <CircleXIcon />
-                        </Pressable>
-                      )}
+                    <View style={styles.headerNumberContainer}>
+                      <Text style={styles.headerNumberText}>010</Text>
+                      <Text style={styles.headerNumberText}>
+                        {phoneNumberLabel()}
+                      </Text>
                     </View>
-                    <View style={styles.divisor}></View>
+                    {number.length > 0 && (
+                      <Pressable
+                        onPress={() => {
+                          setNumber('');
+                        }}>
+                        <CircleXIcon width={18} height={18} />
+                      </Pressable>
+                    )}
                   </View>
+                  <View style={styles.divisor}></View>
+                </View>
+                <View
+                  style={[
+                    {
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                    },
+                  ]}>
                   {NUMBER_SEQUENCE.map((row, rowIndex) => (
                     <View key={rowIndex} style={styles.numberInputContainer}>
                       {row.map((number, numberIndex) => (
                         <Pressable
                           key={numberIndex}
-                          style={styles.numberInputButton}
+                          style={({pressed}) => [
+                            {
+                              backgroundColor: pressed ? '#E5E5E5' : '#fff',
+                              borderRadius: 8,
+                            },
+                            // 또는 추가 스타일이 있으면 아래처럼
+                            styles.numberInputButton,
+                          ]}
                           onPress={() => onNumberPress(number)}>
                           <Text style={styles.numberInputText}>{number}</Text>
                         </Pressable>
                       ))}
                     </View>
                   ))}
-                  <View
-                    style={[
-                      styles.numberInputContainer,
-                      {
-                        justifyContent:
-                          number.length > 0 ? 'flex-end' : 'center',
-                      },
-                    ]}>
+                  <View style={styles.numberInputContainer}>
+                    <Pressable style={styles.numberInputButton}></Pressable>
                     <Pressable
-                      style={styles.numberInputButton}
+                      style={({pressed}) => [
+                        {
+                          backgroundColor: pressed ? '#E5E5E5' : '#fff',
+                          borderRadius: 8,
+                        },
+                        // 또는 추가 스타일이 있으면 아래처럼
+                        styles.numberInputButton,
+                      ]}
                       onPress={() => onNumberPress(0)}>
                       <Text style={styles.numberInputText}>0</Text>
                     </Pressable>
-                    {number.length > 0 && (
-                      <Pressable
-                        style={styles.numberInputButton}
-                        onPress={() => onNumberPress('c')}>
-                        <LeftArrowIcon />
-                      </Pressable>
-                    )}
+                    <Pressable
+                      style={({pressed}) => [
+                        {
+                          backgroundColor: pressed ? '#E5E5E5' : '#fff',
+                          borderRadius: 8,
+                        },
+                        // 또는 추가 스타일이 있으면 아래처럼
+                        styles.numberInputButton,
+                      ]}
+                      onPress={() => onNumberPress('c')}>
+                      <LeftArrowIcon />
+                    </Pressable>
                   </View>
                 </View>
-                <View style={styles.confirmContainer}>
-                  <Pressable
-                    style={styles.confirmButton}
-                    onPress={onConfirmPress}>
-                    <LinearGradient
-                      colors={['#FE8300', '#FC4A00']}
-                      locations={[0.3, 1]}
-                      start={{x: 0, y: 0}}
-                      end={{x: 1, y: 1}}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        borderRadius: 20,
-                      }}>
-                      <Text style={styles.confirmButtonText}>조회하기</Text>
-                    </LinearGradient>
-                  </Pressable>
-                </View>
+              </View>
+              <View style={styles.confirmContainer}>
+                <Pressable
+                  style={styles.confirmButton}
+                  onPress={onConfirmPress}>
+                  <LinearGradient
+                    colors={['#FE8300', '#FC4A00']}
+                    locations={[0.3, 1]}
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 1}}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 20,
+                    }}>
+                    <Text style={styles.confirmButtonText}>조회하기</Text>
+                  </LinearGradient>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -329,7 +334,7 @@ const NumberInputScreen = ({navigation}: any) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: 9,
+                    marginBottom: 4,
                   },
                 ]}>
                 <Text
@@ -337,7 +342,6 @@ const NumberInputScreen = ({navigation}: any) => {
                     styles.welcomeText,
                     {
                       color: '#191D2B',
-                      fontFamily: 'sf-ui-display-semibold',
                     },
                   ]}>
                   <Text
@@ -345,7 +349,7 @@ const NumberInputScreen = ({navigation}: any) => {
                       styles.welcomeText,
                       {
                         color: '#FE7901',
-                        fontFamily: 'Prentendard-Regular',
+                        fontFamily: 'sf-ui-display-semibold',
                       },
                     ]}>
                     010{phoneNumberLabel()}
@@ -379,7 +383,7 @@ const NumberInputScreen = ({navigation}: any) => {
                   borderColor: '#E0E0E9',
                   borderWidth: 0.5,
                   borderRadius: 10,
-                  marginBottom: 36,
+                  marginBottom: 25,
                   marginTop: 15,
                 }}>
                 <View style={styles.termsContainer}>
@@ -520,59 +524,61 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   labelTitleText: {
-    fontSize: 28,
+    fontSize: 32,
     fontFamily: 'Pretendard-Medium',
-    lineHeight: 38,
+    lineHeight: 45,
+    letterSpacing: -1,
   },
   labelSubText: {
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: 'Pretendard-Light',
-    lineHeight: 24,
+    lineHeight: 28,
+    letterSpacing: -1,
   },
   numberInputContainer: {
+    width: '100%',
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'center',
-    width: 266,
-    rowGap: 25,
+    gap: 14,
   },
   numberInputButton: {
     display: 'flex',
-    margin: 10,
-    width: 68.5,
-    height: 33,
+    width: 84,
+    height: 56,
     justifyContent: 'center',
     alignItems: 'center',
   },
   numberInputText: {
-    fontSize: 28,
+    fontSize: 38,
     color: '#4B4D55',
     fontFamily: 'sf-ui-display-semibold',
   },
   headerNumberContainer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   headerNumberText: {
-    fontSize: 28,
+    fontSize: 38,
     color: '#191D2B',
     fontFamily: 'sf-ui-display-semibold',
+    lineHeight: 48,
+    letterSpacing: -1,
   },
   confirmContainer: {
     width: '100%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32.5,
+    marginTop: 55.5,
   },
   confirmButton: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 300,
-    height: 55,
+    width: 344,
+    height: 64,
     backgroundColor: '#FE8300',
     borderRadius: 20,
     // shadow
@@ -663,11 +669,12 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 20,
     lineHeight: 28,
+    fontFamily: 'Pretendard-Medium',
   },
   titleText: {
     width: '100%',
-    fontSize: 24,
-    lineHeight: 32,
+    fontSize: 28,
+    lineHeight: 38,
     fontFamily: 'Pretendard-Medium',
   },
   subtitleText: {
