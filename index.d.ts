@@ -19,6 +19,17 @@ interface User {
   stamps: number;
 }
 
+interface UserContext {
+  selectedCoupon: {
+    americano: number;
+    beverage: number;
+  };
+  possibleCoupons: {
+    americano: number;
+    beverage: number;
+  };
+}
+
 interface Store {
   last_logged: string;
 }
@@ -28,6 +39,7 @@ interface Log {
   phone_number: string;
   timestamp: Date;
   stamp: number;
+  note: string;
 }
 
 interface LogDto {
@@ -35,4 +47,5 @@ interface LogDto {
   phone_number: string;
   timestamp: Timestamp;
   stamp: number;
+  note: string;
 }
