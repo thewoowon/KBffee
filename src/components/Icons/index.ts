@@ -9,3 +9,6 @@ export {default as CircleMinusIcon} from './CircleMinusIcon';
 export {default as ShortLeftArrowIcon} from './ShortLeftArrowIcon';
 export {default as ShortRightArrowIcon} from './ShortRightArrowIcon';
 export {default as RefreshIcon} from './RefreshIcon';
+export {default as NewXIcon} from './NewXIcon';
+export {default as AmericanoIcon} from './AmericanoIcon';
+export {default as BeverageIcon} from './BeverageIcon';
