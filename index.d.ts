@@ -17,6 +17,9 @@ interface User {
   last_used: string;
   level: number;
   stamps: number;
+  phase: 'americano' | 'beverage';
+  americanoCoupons: number;
+  beverageCoupons: number;
 }
 
 interface UserContext {
@@ -48,4 +51,11 @@ interface LogDto {
   timestamp: Timestamp;
   stamp: number;
   note: string;
+}
+
+interface Session {
+  isConfirmed: boolean;
+  last_used: string;
+  phone: string;
+  mode: string;
 }
