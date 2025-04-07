@@ -19,14 +19,22 @@ type BallProps = {
 
 const AnimatedBall = ({index, ball}: BallProps) => {
   const scale = useRef(new Animated.Value(0)).current;
+  const animation = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
-    Animated.timing(scale, {
+    animation.current = Animated.timing(scale, {
       toValue: 1,
       duration: 500,
-      delay: index * 100, // index에 따라 순차 애니메이션
+      delay: index * 100,
       useNativeDriver: true,
-    }).start();
+    });
+
+    animation.current.start();
+
+    return () => {
+      // 💡 cleanup: 애니메이션 강제 종료
+      scale.stopAnimation();
+    };
   }, []);
 
   return (
