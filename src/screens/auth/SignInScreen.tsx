@@ -82,6 +82,7 @@ const SignInScreen = ({navigation, route}: any) => {
                   style={styles.input}
                   onChangeText={handleChange}
                   placeholder="스토어 코드를 입력해주세요"
+                  placeholderTextColor={'#6D6D6D'}
                 />
                 <Pressable style={styles.confirmButton} onPress={handleSignIn}>
                   <Text style={styles.confirmButtonText}>로그인</Text>
