@@ -16,6 +16,7 @@ const TermsScreen = ({navigation, route}: any) => {
   const onConfirmPress = async () => {
     await addUser(phoneNumber);
     await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
       phone: phoneNumber,
       mode: 'onboarding',
     });

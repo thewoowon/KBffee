@@ -11,8 +11,6 @@ import {
   ScrollView,
 } from 'react-native';
 import {useAuth, useFirestore} from '../../hooks';
-import {useFocusEffect} from '@react-navigation/native';
-import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
 import {
   CheckIcon,
   CircleXIcon,
@@ -21,6 +19,8 @@ import {
 } from '../../components/Icons';
 import LinearGradient from 'react-native-linear-gradient';
 import {BackgroundDeco} from '../../components/background';
+import {useFocusEffect} from '@react-navigation/native';
+import {LoadingOverlay} from '../../components/overlay';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -34,6 +34,7 @@ const NumberInputScreen = ({navigation}: any) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [agree, setAgree] = useState(false);
   const {addUser, getUser, updateSession} = useFirestore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onNumberPress = (value: number | string) => {
     if (value === 'c') {
@@ -60,7 +61,9 @@ const NumberInputScreen = ({navigation}: any) => {
 
     // 전화번호 확인 API 호출
     // ...
+    setIsLoading(true);
     const response = await getUser(phoneNumber);
+    setIsLoading(false);
 
     if (!response) {
       // 가입되지 않은 사용자라면
@@ -71,11 +74,11 @@ const NumberInputScreen = ({navigation}: any) => {
     // 이미 가입된 사용자라면
     // ...
     await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
       phone: phoneNumber,
       // 고객인 핸드폰 번호를 입력하고 -> 적립 상황판으로 이동하는
       mode: 'onboarding',
     });
-    console.log('onboarding');
     navigation.navigate('Dashboard', {phoneNumber});
     setNumber('');
   };
@@ -97,8 +100,11 @@ const NumberInputScreen = ({navigation}: any) => {
     }
 
     const phoneNumber = `010${number}`;
+    setIsLoading(true);
     await addUser(phoneNumber);
+    setIsLoading(false);
     await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
       phone: phoneNumber,
       mode: 'onboarding',
     });
@@ -107,33 +113,15 @@ const NumberInputScreen = ({navigation}: any) => {
     setModalVisible(false);
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     // session -> phone
-  //     const db = getFirestore();
-  //     const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
-
-  //     // 세션 변화 알아보기
-  //     const unsubscribe = onSnapshot(sessionRef, doc => {
-  //       if (doc.exists) {
-  //         const data = doc.data();
-  //         console.log('NumberInputScreen Current data: ', data);
-  //         if (!data) {
-  //           console.log('No data found');
-  //           return;
-  //         }
-
-  //         console.log(data);
-  //         // phone이 있으면 화면 이동
-  //         if (data.mode !== 'waiting') {
-  //           navigation.navigate('Standby');
-  //         }
-  //       }
-  //     });
-
-  //     return () => unsubscribe();
-  //   }, [storeCode]),
-  // ); // ✅ 의존성 배열 `[]` → 최초 1회 실행
+  useFocusEffect(
+    useCallback(() => {
+      updateSession(`session_${storeCode}`, {
+        last_used: new Date().toISOString().split('T')[0],
+        phone: '',
+        mode: 'waiting',
+      });
+    }, [storeCode]),
+  );
 
   return (
     <View style={styles.container}>
@@ -143,6 +131,7 @@ const NumberInputScreen = ({navigation}: any) => {
         translucent={false}
       />
       <SafeAreaView style={styles.backgroundStyle}>
+        <LoadingOverlay isLoading={isLoading} />
         <View style={[styles.flexRowBox]}>
           <View
             style={[
@@ -190,6 +179,13 @@ const NumberInputScreen = ({navigation}: any) => {
                   width: 420,
                   height: 552,
                   backgroundColor: '#ffffff',
+                  shadowColor: '#000000',
+                  shadowOffset: {
+                    width: 0,
+                    height: 4.5,
+                  },
+                  shadowOpacity: 0.07,
+                  shadowRadius: 22,
                 },
               ]}>
               <View
@@ -258,8 +254,8 @@ const NumberInputScreen = ({navigation}: any) => {
                           key={numberIndex}
                           style={({pressed}) => [
                             {
-                              backgroundColor: pressed ? '#E5E5E5' : '#fff',
-                              borderRadius: 8,
+                              backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                              borderRadius: 10,
                             },
                             // 또는 추가 스타일이 있으면 아래처럼
                             styles.numberInputButton,
@@ -275,8 +271,8 @@ const NumberInputScreen = ({navigation}: any) => {
                     <Pressable
                       style={({pressed}) => [
                         {
-                          backgroundColor: pressed ? '#E5E5E5' : '#fff',
-                          borderRadius: 8,
+                          backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                          borderRadius: 10,
                         },
                         // 또는 추가 스타일이 있으면 아래처럼
                         styles.numberInputButton,
@@ -287,8 +283,8 @@ const NumberInputScreen = ({navigation}: any) => {
                     <Pressable
                       style={({pressed}) => [
                         {
-                          backgroundColor: pressed ? '#E5E5E5' : '#fff',
-                          borderRadius: 8,
+                          backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                          borderRadius: 10,
                         },
                         // 또는 추가 스타일이 있으면 아래처럼
                         styles.numberInputButton,
@@ -301,7 +297,12 @@ const NumberInputScreen = ({navigation}: any) => {
               </View>
               <View style={styles.confirmContainer}>
                 <Pressable
-                  style={styles.confirmButton}
+                  style={({pressed}) => [
+                    styles.confirmButton,
+                    {
+                      width: pressed ? 332 : 344,
+                    },
+                  ]}
                   onPress={onConfirmPress}>
                   <LinearGradient
                     colors={['#FE8300', '#FC4A00']}
@@ -366,6 +367,7 @@ const NumberInputScreen = ({navigation}: any) => {
                     padding: 7,
                   }}
                   onPress={() => {
+                    setAgree(false);
                     setModalVisible(false);
                   }}>
                   <XIcon />
@@ -450,17 +452,20 @@ const NumberInputScreen = ({navigation}: any) => {
                   </Text>
                 </Pressable>
                 <Pressable
-                  style={[
+                  style={({pressed}) => [
                     styles.confirmButton,
                     {
-                      width: '100%',
+                      width: pressed ? '98%' : '100%',
                       backgroundColor: agree ? '#FE8300' : '#CFCFCF',
                       shadowOpacity: agree ? 0.5 : 0,
                     },
                   ]}
-                  onPress={onAgreePress}>
+                  onPress={onAgreePress}
+                  disabled={!agree}>
                   <LinearGradient
-                    colors={['#FE8300', '#FC4A00']}
+                    colors={
+                      agree ? ['#FE8300', '#FC4A00'] : ['#EDEDED', '#EDEDED']
+                    }
                     locations={[0.3, 1]}
                     start={{x: 0, y: 0}}
                     end={{x: 1, y: 1}}
@@ -580,7 +585,7 @@ const styles = StyleSheet.create({
     width: 344,
     height: 64,
     backgroundColor: '#FE8300',
-    borderRadius: 20,
+    borderRadius: 24,
     // shadow
     shadowColor: '#FE6D00',
     shadowOffset: {

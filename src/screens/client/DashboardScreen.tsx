@@ -57,9 +57,11 @@ const DashboardScreen = ({navigation, route}: any) => {
   const phoneNumber = route.params?.phoneNumber;
   const {storeCode} = useAuth();
   const [timeLeft, setTimeLeft] = useState(60);
+  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [prevUser, setPrevUser] = useState<User | null>(null);
 
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const userRef = useRef<User | null>(null);
   const prevUserRef = useRef<User | null>(null);
 
@@ -75,11 +77,7 @@ const DashboardScreen = ({navigation, route}: any) => {
   };
 
   const goBack = async () => {
-    await updateSession(`session_${storeCode}`, {
-      phone: '',
-      mode: 'waiting',
-    });
-    // navigation.goBack();
+    setTimeLeft(3);
   };
 
   useEffect(() => {
@@ -89,19 +87,6 @@ const DashboardScreen = ({navigation, route}: any) => {
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const fetchUser = async () => {
-  //       const user = await getUser(phoneNumber);
-  //       console.log('fetchUser', user);
-  //       if (user) {
-  //         setUser(user as User);
-  //       }
-  //     };
-  //     fetchUser();
-  //   }, [phoneNumber]),
-  // );
 
   useEffect(() => {
     userRef.current = user;
@@ -148,13 +133,12 @@ const DashboardScreen = ({navigation, route}: any) => {
 
       return () => unsubscribe();
     }, [phoneNumber]),
-  ); // ✅ 의존성 배열 `[]` → 최초 1회 실행
+  );
 
   useFocusEffect(
     useCallback(() => {
       const db = getFirestore();
       const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
-
       const unsubscribe = onSnapshot(sessionRef, doc => {
         if (doc.exists) {
           const data = doc.data();
@@ -163,47 +147,54 @@ const DashboardScreen = ({navigation, route}: any) => {
             console.log('No data found');
             return;
           }
+
           if (data.phone === '' && data.mode === 'waiting') {
-            console.log('초기화면으로 이동');
-            navigation.navigate('NumberInput');
+            // 3초로 줄이기
+            setTimeLeft(3);
           }
+
+          setSession(data as Session);
         }
       });
 
       return () => unsubscribe();
     }, [storeCode]),
-  ); // ✅ 의존성 배열 `[]` → 최초 1회 실행
+  );
 
-  useFocusEffect(
-    useCallback(() => {
-      let timer: NodeJS.Timeout;
-      let isMounted = true;
+  useEffect(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
 
-      if (timeLeft > 0) {
-        timer = setInterval(() => {
-          setTimeLeft(prevTime => {
-            if (!isMounted) return prevTime;
+    if (timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            timerRef.current = null;
 
-            if (prevTime <= 1) {
-              clearInterval(timer);
+            if (session && session.phone !== '') {
               updateSession(`session_${storeCode}`, {
                 last_used: new Date().toISOString().split('T')[0],
                 phone: '',
                 mode: 'waiting',
               });
-              return 0;
             }
-            return prevTime - 1;
-          });
-        }, 1000);
-      }
+            navigation.replace('NumberInput');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
 
-      return () => {
-        isMounted = false;
-        clearInterval(timer);
-      };
-    }, [timeLeft, navigation, storeCode]),
-  );
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [timeLeft]);
 
   return (
     <View style={styles.container}>
@@ -270,11 +261,12 @@ const DashboardScreen = ({navigation, route}: any) => {
                       style={[
                         styles.labelSubText,
                         {
-                          fontFamily: 'Pretendard-Bold',
+                          width: 24,
+                          fontFamily: 'Pretendard-SemiBold',
                         },
                       ]}>
                       {timeLeft}
-                    </Text>
+                    </Text>{' '}
                     초 후 화면이 종료됩니다
                   </Text>
                 </View>
@@ -330,18 +322,18 @@ const DashboardScreen = ({navigation, route}: any) => {
                         style={[
                           styles.labelSubText,
                           {
-                            width: 20,
-                            fontFamily: 'Pretendard-Bold',
+                            width: 24,
+                            fontFamily: 'Pretendard-SemiBold',
                           },
                         ]}>
                         {timeLeft}
-                      </Text>
+                      </Text>{' '}
                       초 후 화면이 종료됩니다
                     </Text>
                   )}
                 </View>
                 <View style={styles.beverageWrapper}>
-                  {user && user.stamps > 19 && (
+                  {user && user.beverageCoupons > 0 && (
                     <View style={styles.beverageBox}>
                       <View>
                         <View
@@ -353,17 +345,17 @@ const DashboardScreen = ({navigation, route}: any) => {
                           }}>
                           <BeverageIcon />
                           <Text style={styles.beverageTitleText}>
-                            조제음료 {Math.floor(user.stamps / 20)}잔 무료로
-                            사용 가능해요!
+                            조제음료 {user.beverageCoupons}잔 무료로 사용
+                            가능해요!
                           </Text>
                         </View>
                         <Text style={styles.beverageBodyText}>
-                          스탬프 20개 소진
+                          스탬프 10개 소진
                         </Text>
                       </View>
                     </View>
                   )}
-                  {user && user.stamps > 9 && (
+                  {user && user.americanoCoupons > 0 && (
                     <View style={styles.beverageBox}>
                       <View>
                         <View
@@ -375,8 +367,8 @@ const DashboardScreen = ({navigation, route}: any) => {
                           }}>
                           <AmericanoIcon />
                           <Text style={styles.beverageTitleText}>
-                            아메리카노 {Math.floor(user.stamps / 10)}잔 무료로
-                            사용 가능해요!
+                            아메리카노 {user.americanoCoupons}잔 무료로 사용
+                            가능해요!
                           </Text>
                         </View>
                         <Text style={styles.beverageBodyText}>
