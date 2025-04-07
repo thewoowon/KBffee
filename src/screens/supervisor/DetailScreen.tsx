@@ -41,6 +41,9 @@ const DetailScreen = ({navigation, route}: any) => {
     last_used: '',
     level: 0,
     stamps: 0,
+    phase: 'americano',
+    americanoCoupons: 0,
+    beverageCoupons: 0,
   });
 
   const {updateUser, updateSession, addLog} = useFirestore();
@@ -48,6 +51,7 @@ const DetailScreen = ({navigation, route}: any) => {
   const handleInit = async () => {
     // 세션을 초기화하고 메인 화면으로 이동
     await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
       phone: '',
       mode: 'waiting',
     });
@@ -179,6 +183,7 @@ const DetailScreen = ({navigation, route}: any) => {
 
   const goBack = async () => {
     await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
       phone: '',
       mode: 'waiting',
     });

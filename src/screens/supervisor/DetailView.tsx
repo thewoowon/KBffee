@@ -50,6 +50,9 @@ const DetailView = ({
     last_used: '',
     level: 0,
     stamps: 0,
+    phase: 'americano',
+    americanoCoupons: 0,
+    beverageCoupons: 0,
   });
 
   const [userContext, setUserContext] = useState<UserContext>({
@@ -89,20 +92,60 @@ const DetailView = ({
       return;
     }
 
-    await updateUser(phoneNumber, {
+    const currentQuotient = Math.floor(user.stamps / 10);
+    const totalQuotient = Math.floor((user.stamps + numberValue) / 10);
+    const difference = totalQuotient - currentQuotient;
+
+    let phase = user.phase;
+    let americanoCoupons = user.americanoCoupons;
+    let beverageCoupons = user.beverageCoupons;
+
+    for (let index = 0; index < difference; index++) {
+      if (phase === 'americano') {
+        americanoCoupons += 1;
+        phase = 'beverage';
+      } else {
+        beverageCoupons += 1;
+        phase = 'americano';
+      }
+    }
+
+    const updateContext = {
       stamps: user.stamps + numberValue,
-    });
+      phase,
+      americanoCoupons,
+      beverageCoupons,
+    };
+
+    await updateUser(phoneNumber, updateContext);
 
     addLog({
       action: 'stamp_saved',
       phone_number: phoneNumber,
       stamp: numberValue,
       timestamp: Timestamp.now(),
-      // 비고
       note: '',
     });
 
     setNumber('');
+
+    Toast.show({
+      type: 'custom_type',
+      text1: `스탬프 ${numberValue}개 적립되었습니다`,
+      text2: phoneNumber,
+      visibilityTime: 5000,
+      onPress: () => {
+        Toast.hide();
+      },
+    });
+
+    await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
+      phone: '',
+      mode: 'waiting',
+    });
+
+    updateLogs();
   };
 
   const handleUsing = async () => {
@@ -129,8 +172,15 @@ const DetailView = ({
       return;
     }
 
+    // phase는
     await updateUser(phoneNumber, {
       stamps: user.stamps - numberValue,
+      americanoCoupons:
+        userContext.possibleCoupons.americano -
+        userContext.selectedCoupon.americano,
+      beverageCoupons:
+        userContext.possibleCoupons.beverage -
+        userContext.selectedCoupon.beverage,
     });
 
     let noteString = '';
@@ -159,7 +209,7 @@ const DetailView = ({
 
     Toast.show({
       type: 'custom_type',
-      text1: `스탬프 ${numberValue}개 사용 완료 - ${noteString}`,
+      text1: `스탬프 ${numberValue}개 사용되었습니다 - ${noteString}`,
       text2: phoneNumber,
       visibilityTime: 5000,
       onPress: () => {
@@ -168,6 +218,7 @@ const DetailView = ({
     });
 
     await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
       phone: '',
       mode: 'waiting',
     });
@@ -183,7 +234,10 @@ const DetailView = ({
 
     setNumber('');
     setUserContext({
-      ...userContext,
+      possibleCoupons: {
+        americano: user.americanoCoupons,
+        beverage: user.beverageCoupons,
+      },
       selectedCoupon: {
         americano: 0,
         beverage: 0,
@@ -206,7 +260,10 @@ const DetailView = ({
         return;
       }
       setUserContext({
-        ...userContext,
+        possibleCoupons: {
+          americano: user.americanoCoupons,
+          beverage: user.beverageCoupons,
+        },
         selectedCoupon: {
           americano: 0,
           beverage: 0,
@@ -240,7 +297,6 @@ const DetailView = ({
       }
 
       if (value === '+10') {
-        console.log('number', number);
         if (number.length > 2) {
           Alert.alert(
             '적립하는 쿠폰의 수가 많은 것 같아요',
@@ -266,6 +322,7 @@ const DetailView = ({
 
   const close = async () => {
     await updateSession(`session_${storeCode}`, {
+      last_used: new Date().toISOString().split('T')[0],
       phone: '',
       mode: 'waiting',
     });
@@ -273,11 +330,13 @@ const DetailView = ({
     updateLogs();
   };
 
+  // 무조건 10개씩 사용
   const onClickCoupon = (type: 'americano' | 'beverage') => () => {
     if (type === 'americano') {
+      // 사용 가능하기 때문에 함수가 동작
       // 총사용하는 쿠폰의 개수를 확인
       const americanoStamp = (userContext.selectedCoupon.americano + 1) * 10;
-      const beverageStamp = userContext.selectedCoupon.beverage * 20;
+      const beverageStamp = userContext.selectedCoupon.beverage * 10;
       setNumber(americanoStamp + beverageStamp + '');
       setUserContext({
         ...userContext,
@@ -289,7 +348,7 @@ const DetailView = ({
     } else {
       // 총사용하는 쿠폰의 개수를 확인
       const americanoStamp = userContext.selectedCoupon.americano * 10;
-      const beverageStamp = (userContext.selectedCoupon.beverage + 1) * 20;
+      const beverageStamp = (userContext.selectedCoupon.beverage + 1) * 10;
       setNumber(americanoStamp + beverageStamp + '');
       setUserContext({
         ...userContext,
@@ -319,23 +378,17 @@ const DetailView = ({
           }
           const userProfile = {...data} as User;
           setUser(userProfile);
-          const rawStamps = userProfile.stamps ?? 0;
-          const stamps =
-            typeof rawStamps === 'number'
-              ? rawStamps
-              : parseInt(rawStamps, 10) || 0;
           const newUserContext: UserContext = {
             selectedCoupon: {
               americano: 0,
               beverage: 0,
             },
             possibleCoupons: {
-              americano: Math.floor(stamps / 10),
-              beverage: Math.floor(stamps / 20),
+              americano: userProfile.americanoCoupons,
+              beverage: userProfile.beverageCoupons,
             },
           };
           setUserContext(newUserContext);
-          console.log('UserContext', newUserContext);
         }
       });
 
@@ -443,7 +496,7 @@ const DetailView = ({
                         </Text>
                       </View>
                       <Pressable onPress={onClickCoupon('beverage')}>
-                        <Text style={styles.beverageButtonText}>20개 입력</Text>
+                        <Text style={styles.beverageButtonText}>10개 입력</Text>
                       </Pressable>
                       {userContext.possibleCoupons.beverage -
                         userContext.selectedCoupon.beverage >
@@ -655,8 +708,8 @@ const DetailView = ({
                             key={numberIndex}
                             style={({pressed}) => [
                               {
-                                backgroundColor: pressed ? '#E5E5E5' : '#fff',
-                                borderRadius: 8,
+                                backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                                borderRadius: 10,
                               },
                               // 또는 추가 스타일이 있으면 아래처럼
                               styles.numberInputButton,
@@ -672,8 +725,8 @@ const DetailView = ({
                       <Pressable
                         style={({pressed}) => [
                           {
-                            backgroundColor: pressed ? '#E5E5E5' : '#fff',
-                            borderRadius: 8,
+                            backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                            borderRadius: 10,
                           },
                           // 또는 추가 스타일이 있으면 아래처럼
                           styles.numberInputButton,
@@ -684,8 +737,8 @@ const DetailView = ({
                       <Pressable
                         style={({pressed}) => [
                           {
-                            backgroundColor: pressed ? '#E5E5E5' : '#fff',
-                            borderRadius: 8,
+                            backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                            borderRadius: 10,
                           },
                           // 또는 추가 스타일이 있으면 아래처럼
                           styles.numberInputButton,
@@ -700,9 +753,10 @@ const DetailView = ({
                     userContext.selectedCoupon.beverage > 0 ? (
                       <>
                         <Pressable
-                          style={[
+                          style={({pressed}) => [
                             styles.confirmButton,
                             {
+                              width: pressed ? 142 : 150,
                               backgroundColor: '#EDEDED',
                               shadowColor: '#EDEDED',
                               gap: 6,
@@ -721,9 +775,10 @@ const DetailView = ({
                           </Text>
                         </Pressable>
                         <Pressable
-                          style={[
+                          style={({pressed}) => [
                             styles.confirmButton,
                             {
+                              width: pressed ? 142 : 150,
                               backgroundColor: '#0090FE',
                               shadowColor: '#0090FE',
                             },
@@ -753,9 +808,13 @@ const DetailView = ({
                       </>
                     ) : (
                       <Pressable
-                        style={[
+                        style={({pressed}) => [
                           styles.confirmButton,
-                          {backgroundColor: '#FE6A00', shadowColor: '#FE6A00'},
+                          {
+                            width: pressed ? '98%' : '100%',
+                            backgroundColor: '#FE6A00',
+                            shadowColor: '#FE6A00',
+                          },
                         ]}
                         onPress={handleApprove}>
                         <LinearGradient
@@ -795,7 +854,7 @@ const DetailView = ({
                       <Text style={styles.beverageBodyText}>
                         사용 후 잔여 스탬프:{' '}
                         {user.stamps -
-                          userContext.selectedCoupon.beverage * 20 -
+                          userContext.selectedCoupon.beverage * 10 -
                           userContext.selectedCoupon.americano * 10}
                         개
                       </Text>
@@ -998,7 +1057,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
     height: 72,
     backgroundColor: '#FE8300',
     borderRadius: 24,

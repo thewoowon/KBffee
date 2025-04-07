@@ -23,6 +23,7 @@ import {
 import dayjs from 'dayjs';
 import {BackgroundDeco} from '../../components/background';
 import DetailView from './DetailView';
+import {LoadingOverlay} from '../../components/overlay';
 
 const MainScreen = ({navigation, route}: any) => {
   const {storeCode} = useAuth();
@@ -32,6 +33,7 @@ const MainScreen = ({navigation, route}: any) => {
   const [date, setDate] = useState(dayjs());
   const [logs, setLogs] = useState<Log[]>([]);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = () => {
     setIsAuthenticated(false);
@@ -61,8 +63,9 @@ const MainScreen = ({navigation, route}: any) => {
 
   const updateLogs = async () => {
     const dateString = date.format('YYYY-MM-DD');
-    console.log('updateLogs', dateString);
+    setIsLoading(true);
     const logs = await getLogs(dateString);
+    setIsLoading(false);
     if (logs) {
       setLogs(logs);
     }
@@ -72,7 +75,9 @@ const MainScreen = ({navigation, route}: any) => {
     useCallback(() => {
       const fetchLogs = async () => {
         const dateString = date.format('YYYY-MM-DD');
+        setIsLoading(true);
         const logs = await getLogs(dateString);
+        setIsLoading(false);
         if (logs) {
           setLogs(logs);
         }
@@ -117,6 +122,7 @@ const MainScreen = ({navigation, route}: any) => {
         translucent={false}
       />
       <SafeAreaView style={styles.backgroundStyle}>
+        <LoadingOverlay isLoading={isLoading} />
         <View style={styles.innerContainer}>
           <View
             style={[
@@ -145,6 +151,14 @@ const MainScreen = ({navigation, route}: any) => {
                 backgroundColor: 'white',
                 borderRadius: 20,
                 gap: 20,
+                shadowColor: '#000000',
+                shadowOffset: {
+                  width: 0,
+                  height: 4.5,
+                },
+                shadowOpacity: 0.07,
+                shadowRadius: 22,
+                elevation: 6,
               },
             ]}>
             <View
@@ -160,30 +174,32 @@ const MainScreen = ({navigation, route}: any) => {
                     gap: 18,
                   },
                 ]}>
-                <Pressable
-                  onPress={() => setDate(dayjs())}
-                  style={[
-                    styles.flexRowBox,
-                    {
-                      backgroundColor: '#F3F3F3',
-                      width: 70,
-                      height: 32,
-                      borderRadius: 6,
-                      gap: 4,
-                    },
-                  ]}>
-                  <RefreshIcon width={16} height={16} />
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      lineHeight: 26,
-                      letterSpacing: -1,
-                      fontFamily: 'Pretendard-Medium',
-                      color: '#595959',
-                    }}>
-                    오늘
-                  </Text>
-                </Pressable>
+                {date.format('YYYY-MM-DD') !== dayjs().format('YYYY-MM-DD') && (
+                  <Pressable
+                    onPress={() => setDate(dayjs())}
+                    style={[
+                      styles.flexRowBox,
+                      {
+                        backgroundColor: '#F3F3F3',
+                        width: 70,
+                        height: 32,
+                        borderRadius: 6,
+                        gap: 4,
+                      },
+                    ]}>
+                    <RefreshIcon width={16} height={16} />
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        lineHeight: 26,
+                        letterSpacing: -1,
+                        fontFamily: 'Pretendard-Medium',
+                        color: '#595959',
+                      }}>
+                      오늘
+                    </Text>
+                  </Pressable>
+                )}
                 <View
                   style={[
                     styles.flexRowBox,
@@ -248,7 +264,7 @@ const MainScreen = ({navigation, route}: any) => {
                       fontSize: 14,
                       lineHeight: 24,
                       letterSpacing: -1,
-                      flex: 1,
+                      width: 100,
                       color: '#9F9FA6',
                     }}>
                     회원정보
@@ -320,6 +336,7 @@ const MainScreen = ({navigation, route}: any) => {
                           </View>
                           <Text
                             style={{
+                              width: 100,
                               color: '#1B2128',
                               fontSize: 14,
                               lineHeight: 24,
@@ -375,11 +392,7 @@ const MainScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </View>
-        <Modal
-          style={{}}
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}>
+        <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <DetailView
             navigation={navigation}
             phoneNumber={phoneNumber}
@@ -442,6 +455,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
     gap: 6,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 4.5,
+    },
+    shadowOpacity: 0.07,
+    shadowRadius: 22,
+    elevation: 6,
   },
   buttonText: {
     color: '#191D2B',
@@ -498,8 +519,8 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#93989E',
     fontFamily: 'Pretendard-Regular',
-    fontSize: 14,
-    lineHeight: 19,
+    fontSize: 16,
+    lineHeight: 24,
     letterSpacing: -1,
   },
 });
