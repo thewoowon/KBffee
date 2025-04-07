@@ -15,7 +15,13 @@ const MyCustomToast = ({
 }: MyCustomToastProps) => (
   <View style={styles.customToastContainer}>
     <View>
-      <Text style={styles.customSubtitleText}>고객번호 {text2}</Text>
+      <Text style={styles.customSubtitleText}>
+        고객번호{' '}
+        {
+          // 3자리 , 4자리 ,4자리
+          text2?.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') || ''
+        }
+      </Text>
       <Text style={styles.customTitleText}>{text1}</Text>
     </View>
     <Pressable
