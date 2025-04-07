@@ -28,6 +28,9 @@ const useFirestore = () => {
         last_used: date.split('T')[0],
         level: 0,
         stamps: 0,
+        phase: 'americano',
+        americanoCoupons: 0,
+        beverageCoupons: 0,
       });
 
       // 회원가입 시 동시에 약관 동의 처리
@@ -146,8 +149,6 @@ const useFirestore = () => {
           timestamp: data.timestamp.toDate(),
         };
       });
-
-      console.log('Logs:', logs);
 
       return logs;
     } catch (error) {
