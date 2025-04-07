@@ -284,10 +284,8 @@ const DashboardScreen = ({navigation, route}: any) => {
                     paddingTop: 28,
                   },
                 ]}>
-                <View style={[styles.flexBox, {gap: 7}]}>
-                  <Pressable onPress={goBack}>
-                    <LeftArrowIcon />
-                  </Pressable>
+                <Pressable style={[styles.flexBox, {gap: 7}]} onPress={goBack}>
+                  <LeftArrowIcon />
                   <Text
                     style={{
                       fontSize: 20,
@@ -298,7 +296,7 @@ const DashboardScreen = ({navigation, route}: any) => {
                     }}>
                     뒤로가기
                   </Text>
-                </View>
+                </Pressable>
                 <View style={styles.labelBox}>
                   <Text style={styles.labelSubText}>
                     <Text

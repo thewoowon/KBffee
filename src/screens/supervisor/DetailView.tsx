@@ -422,7 +422,8 @@ const DetailView = ({
                 borderRadius: 35,
               },
             ]}>
-            <View
+            <Pressable
+              onPress={close}
               style={[
                 styles.flexBox,
                 {gap: 6, position: 'absolute', top: 32, right: 32},
@@ -436,10 +437,8 @@ const DetailView = ({
                 }}>
                 닫기
               </Text>
-              <Pressable onPress={close}>
-                <NewXIcon width={20} height={20} />
-              </Pressable>
-            </View>
+              <NewXIcon width={20} height={20} />
+            </Pressable>
             <View
               style={[
                 {
