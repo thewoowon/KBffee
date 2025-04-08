@@ -2825,9 +2825,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/app@npm:^21.11.0":
-  version: 21.12.1
-  resolution: "@react-native-firebase/app@npm:21.12.1"
+"@react-native-firebase/app@npm:21.13.0":
+  version: 21.13.0
+  resolution: "@react-native-firebase/app@npm:21.13.0"
   dependencies:
     firebase: 11.3.1
   peerDependencies:
@@ -2837,16 +2837,31 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: debaa10dd8f9ccb793e4db54e4b16aa55e1b02c3d397f752ae9739f0f33395dfc65e739ef810bdfddb5d0181dbb5fbd9af715b4d43b602e1f3c236e4db5eb474
+  checksum: 79635a4ad45ac6bc372df7ccf5dfa769fbaab3e85463285b8722ece979b1ff3c06af5e2d9b870d396e70f34ed05323b06ce0e4a85e3e5e4837c4fbd04a14d82b
   languageName: node
   linkType: hard
 
-"@react-native-firebase/firestore@npm:^21.11.0":
-  version: 21.12.1
-  resolution: "@react-native-firebase/firestore@npm:21.12.1"
+"@react-native-firebase/auth@npm:^21.13.0":
+  version: 21.13.0
+  resolution: "@react-native-firebase/auth@npm:21.13.0"
+  dependencies:
+    plist: ^3.1.0
   peerDependencies:
-    "@react-native-firebase/app": 21.12.1
-  checksum: 72b263d0762cf4f0ce8fb1c31c8f54cfd6dff5ac907ad966156a4c3397140f39444068a06cf9776039a81d74b12d4f6009ef553fcaa7eb405aa2a6630295239c
+    "@react-native-firebase/app": 21.13.0
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 9c089a1a4a6781d883b25187ff2a619e69a7a2903c71a30b737a11f233fca0f48328eaa7c6e017271c8e5e6bc70ed7df1e4fe99b21be3b8476f4fce434b4a0bb
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/firestore@npm:21.13.0":
+  version: 21.13.0
+  resolution: "@react-native-firebase/firestore@npm:21.13.0"
+  peerDependencies:
+    "@react-native-firebase/app": 21.13.0
+  checksum: 8fb68ee65a62643cd9b96c94abf12ad14e23fa6b415c94d36588cee832e5a08125d879cfa2a9553ad49a7c23391305be3ed62703baf1bfe769447a24d3c9c705
   languageName: node
   linkType: hard
 
@@ -3584,6 +3599,13 @@ __metadata:
   version: 1.3.0
   resolution: "@ungap/structured-clone@npm:1.3.0"
   checksum: 64ed518f49c2b31f5b50f8570a1e37bde3b62f2460042c50f132430b2d869c4a6586f13aa33a58a4722715b8158c68cae2827389d6752ac54da2893c83e480fc
+  languageName: node
+  linkType: hard
+
+"@xmldom/xmldom@npm:^0.8.8":
+  version: 0.8.10
+  resolution: "@xmldom/xmldom@npm:0.8.10"
+  checksum: 4c136aec31fb3b49aaa53b6fcbfe524d02a1dc0d8e17ee35bd3bf35e9ce1344560481cd1efd086ad1a4821541482528672306d5e37cdbd187f33d7fadd3e2cf0
   languageName: node
   linkType: hard
 
@@ -7417,8 +7439,9 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
-    "@react-native-firebase/app": ^21.11.0
-    "@react-native-firebase/firestore": ^21.11.0
+    "@react-native-firebase/app": 21.13.0
+    "@react-native-firebase/auth": ^21.13.0
+    "@react-native-firebase/firestore": 21.13.0
     "@react-native/babel-preset": 0.75.4
     "@react-native/eslint-config": 0.75.4
     "@react-native/metro-config": 0.75.4
@@ -8705,6 +8728,17 @@ __metadata:
   dependencies:
     find-up: ^4.0.0
   checksum: 9863e3f35132bf99ae1636d31ff1e1e3501251d480336edb1c211133c8d58906bed80f154a1d723652df1fda91e01c7442c2eeaf9dc83157c7ae89087e43c8d6
+  languageName: node
+  linkType: hard
+
+"plist@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "plist@npm:3.1.0"
+  dependencies:
+    "@xmldom/xmldom": ^0.8.8
+    base64-js: ^1.5.1
+    xmlbuilder: ^15.1.1
+  checksum: c8ea013da8646d4c50dff82f9be39488054621cc229957621bb00add42b5d4ce3657cf58d4b10c50f7dea1a81118f825838f838baeb4e6f17fab453ecf91d424
   languageName: node
   linkType: hard
 
@@ -10792,6 +10826,13 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: f9bb062abf54cc8f02d94ca86dcd349c3945d63851f5d07a3a61c2fcb755b15a88e943a63cf580cbdb5b74436d67ef6b67f745b8f7c0814e411379138e1863cb
+  languageName: node
+  linkType: hard
+
+"xmlbuilder@npm:^15.1.1":
+  version: 15.1.1
+  resolution: "xmlbuilder@npm:15.1.1"
+  checksum: 14f7302402e28d1f32823583d121594a9dca36408d40320b33f598bd589ca5163a352d076489c9c64d2dc1da19a790926a07bf4191275330d4de2b0d85bb1843
   languageName: node
   linkType: hard
 
