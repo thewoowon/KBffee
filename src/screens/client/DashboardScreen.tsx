@@ -1,6 +1,5 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  Animated,
   Pressable,
   SafeAreaView,
   StatusBar,
@@ -10,7 +9,6 @@ import {
 } from 'react-native';
 import {useAuth, useFirestore} from '../../hooks';
 import {getFirestore, doc, onSnapshot} from '@react-native-firebase/firestore';
-import {useFocusEffect} from '@react-navigation/native';
 import {
   AmericanoIcon,
   BeverageIcon,
@@ -65,8 +63,6 @@ const DashboardScreen = ({navigation, route}: any) => {
   const userRef = useRef<User | null>(null);
   const prevUserRef = useRef<User | null>(null);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current; // 초기값 0
-
   const {updateSession} = useFirestore();
 
   const phoneNumberLabel = () => {
@@ -81,14 +77,6 @@ const DashboardScreen = ({navigation, route}: any) => {
   };
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 2000,
-      useNativeDriver: true,
-    }).start();
-  }, [fadeAnim]);
-
-  useEffect(() => {
     userRef.current = user;
   }, [user]);
 
@@ -96,95 +84,90 @@ const DashboardScreen = ({navigation, route}: any) => {
     prevUserRef.current = prevUser;
   }, [prevUser]);
 
-  useFocusEffect(
-    useCallback(() => {
-      const db = getFirestore();
-      const _userRef = doc(db, 'users', phoneNumber);
+  useEffect(() => {
+    if (!phoneNumber) return;
 
-      const unsubscribe = onSnapshot(_userRef, doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          console.log('Dashboard Current User data: ', data);
-          if (!data) {
-            console.log('No data found');
-            return;
-          }
+    const db = getFirestore();
+    const _userRef = doc(db, 'users', phoneNumber);
 
-          if (!userRef.current && !prevUserRef.current) {
-            // 최초 사용자 정보가 없을 때, 이전 사용자 정보가 없을 때 -> 최초 사용자 정보 저장
-            console.log('최초 사용자 정보 저장');
-            setUser(data as User);
+    const unsubscribe = onSnapshot(_userRef, doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        console.log('Dashboard Current User data: ', data);
+        if (!data) {
+          console.log('No data found');
+          return;
+        }
 
-            return;
-          }
-
-          if (userRef.current) {
-            // 이전 사용자 정보가 있을 때
-            if (userRef.current.stamps !== data.stamps) {
-              // 스탬프 사용 시
-              setTimeLeft(3); // 3초 후 화면 종료
-            }
-          }
-
-          setPrevUser(userRef.current);
+        if (!userRef.current && !prevUserRef.current) {
+          console.log('최초 사용자 정보 저장');
           setUser(data as User);
+          return;
         }
-      });
 
-      return () => unsubscribe();
-    }, [phoneNumber]),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const db = getFirestore();
-      const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
-      const unsubscribe = onSnapshot(sessionRef, doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          console.log('Dashboard Current Session data: ', data);
-          if (!data) {
-            console.log('No data found');
-            return;
-          }
-
-          if (data.phone === '' && data.mode === 'waiting') {
-            // 3초로 줄이기
-            setTimeLeft(3);
-          }
-
-          setSession(data as Session);
+        if (userRef.current && userRef.current.stamps !== data.stamps) {
+          setTimeLeft(3); // 스탬프 변경 감지 → 타이머 조정
         }
-      });
 
-      return () => unsubscribe();
-    }, [storeCode]),
-  );
+        setPrevUser(userRef.current);
+        setUser(data as User);
+      }
+    });
+
+    return () => {
+      unsubscribe(); // 🧹 화면 unmount 시 깔끔하게 정리
+    };
+  }, [phoneNumber]);
 
   useEffect(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
+    if (!storeCode) return;
 
+    const db = getFirestore();
+    const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
+
+    const unsubscribe = onSnapshot(sessionRef, doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        console.log('Dashboard Current Session data: ', data);
+        if (!data) {
+          console.log('No data found');
+          return;
+        }
+
+        if (data.phone === '' && data.mode === 'waiting') {
+          setTimeLeft(3); // 즉시 종료 처리
+        }
+
+        setSession(data as Session);
+      }
+    });
+
+    return () => {
+      unsubscribe(); // 🧹 리스너 정리
+    };
+  }, [storeCode]);
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      if (session && session.phone !== '') {
+        updateSession(`session_${storeCode}`, {
+          last_used: new Date().toISOString().split('T')[0],
+          phone: '',
+          mode: 'waiting',
+        });
+      }
+
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'NumberInput'}],
+      });
+    }
+  }, [timeLeft, session, storeCode]);
+
+  useEffect(() => {
     if (timeLeft > 0) {
       timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current!);
-            timerRef.current = null;
-
-            if (session && session.phone !== '') {
-              updateSession(`session_${storeCode}`, {
-                last_used: new Date().toISOString().split('T')[0],
-                phone: '',
-                mode: 'waiting',
-              });
-            }
-            navigation.replace('NumberInput');
-            return 0;
-          }
-          return prev - 1;
-        });
+        setTimeLeft(prev => prev - 1);
       }, 1000);
     }
 
@@ -195,6 +178,13 @@ const DashboardScreen = ({navigation, route}: any) => {
       }
     };
   }, [timeLeft]);
+
+  useEffect(() => {
+    console.log('📱 DashboardScreen mounted');
+    return () => {
+      console.log('🧹 DashboardScreen unmounted');
+    };
+  }, []);
 
   return (
     <View style={styles.container}>

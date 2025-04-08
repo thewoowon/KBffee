@@ -1,13 +1,16 @@
 import {createStackNavigator} from '@react-navigation/stack';
 // import StandbyScreen from './StandbyScreen';
 import NumberInputScreen from './NumberInputScreen';
-import TermsScreen from './TermsScreen';
+// import TermsScreen from './TermsScreen';
 import DashboardScreen from './DashboardScreen';
 
 const Stack = createStackNavigator();
 
 const ClientStack = () => (
-  <Stack.Navigator>
+  <Stack.Navigator
+    screenOptions={{
+      detachPreviousScreen: true,
+    }}>
     {/* <Stack.Screen
       name="Standby"
       component={StandbyScreen}

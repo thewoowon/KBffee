@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -21,6 +21,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {BackgroundDeco} from '../../components/background';
 import {useFocusEffect} from '@react-navigation/native';
 import {LoadingOverlay} from '../../components/overlay';
+// import DashboardView from './DashboardView';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -79,7 +80,10 @@ const NumberInputScreen = ({navigation}: any) => {
       // 고객인 핸드폰 번호를 입력하고 -> 적립 상황판으로 이동하는
       mode: 'onboarding',
     });
-    navigation.navigate('Dashboard', {phoneNumber});
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Dashboard', params: {phoneNumber}}],
+    });
     setNumber('');
   };
 
@@ -108,7 +112,10 @@ const NumberInputScreen = ({navigation}: any) => {
       phone: phoneNumber,
       mode: 'onboarding',
     });
-    navigation.navigate('Dashboard', {phoneNumber});
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Dashboard', params: {phoneNumber}}],
+    });
 
     setModalVisible(false);
   };
@@ -122,6 +129,13 @@ const NumberInputScreen = ({navigation}: any) => {
       });
     }, [storeCode]),
   );
+
+  useEffect(() => {
+    console.log('📱 NumberInputScreen mounted');
+    return () => {
+      console.log('🧹 NumberInputScreen unmounted');
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -484,6 +498,9 @@ const NumberInputScreen = ({navigation}: any) => {
             </View>
           </View>
         </Modal>
+        {/* <Modal animationType="slide" transparent={true} visible={modalVisible}>
+          <DashboardView />
+        </Modal> */}
         <BackgroundDeco />
       </SafeAreaView>
     </View>
