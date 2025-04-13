@@ -8,7 +8,7 @@ import {
   Pressable,
 } from 'react-native';
 import {ProfileIcon, StatisticIcon} from '../../components/Icons';
-import {BackgroundDeco} from '../../components/background';
+// import {BackgroundDeco} from '../../components/background';
 
 const ModeSelectionScreen = ({navigation, route}: any) => {
   const handleSignIn = (mode: 'supervisor' | 'client') => {
@@ -56,7 +56,7 @@ const ModeSelectionScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </View>
-        <BackgroundDeco />
+        {/* <BackgroundDeco /> */}
       </SafeAreaView>
     </View>
   );
