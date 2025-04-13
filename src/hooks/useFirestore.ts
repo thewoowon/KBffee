@@ -10,6 +10,9 @@ import {
   query,
   orderBy,
   limit,
+  startAfter,
+  Timestamp,
+  // getCountFromServer,
 } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 
@@ -31,6 +34,7 @@ const useFirestore = () => {
         phase: 'americano',
         americanoCoupons: 0,
         beverageCoupons: 0,
+        hasRated: false,
       });
 
       // 회원가입 시 동시에 약관 동의 처리
@@ -53,6 +57,12 @@ const useFirestore = () => {
       const db = getFirestore();
       const docRef = doc(db, 'users', userId);
       const docSnap = await getDoc(docRef);
+
+      // const userCollection = collection(db, 'users');
+
+      // const snapshot = await getCountFromServer(userCollection);
+      // const count = snapshot.data().count;
+      // console.log('Count:', count);
 
       if (docSnap.exists) {
         console.log('User Document data:', docSnap.data());
@@ -133,7 +143,7 @@ const useFirestore = () => {
         where('timestamp', '>=', start),
         where('timestamp', '<=', end),
         orderBy('timestamp', 'desc'), // 또는 'desc'
-        limit(100), // 최대 100개
+        limit(50), // 최대 50개
       );
 
       const querySnapshot = await getDocs(logsQuery);
@@ -142,7 +152,6 @@ const useFirestore = () => {
 
       const logs = querySnapshot.docs.map(doc => {
         const data = doc.data();
-        console;
         return {
           id: doc.id,
           ...(data as Log),
@@ -157,6 +166,35 @@ const useFirestore = () => {
     }
   }
 
+  const getLogsAfter = async (dateString: string, afterTimestamp?: Date) => {
+    const db = getFirestore();
+    const logsRef = collection(db, 'logs');
+
+    const start = dayjs(dateString).startOf('day').toDate();
+    const end = dayjs(dateString).endOf('day').toDate();
+
+    let q = query(
+      logsRef,
+      where('timestamp', '>=', start),
+      where('timestamp', '<=', end),
+      orderBy('timestamp', 'desc'), // 최신순
+    );
+    console.log('afterTimestamp', afterTimestamp);
+    if (afterTimestamp) {
+      q = query(q, startAfter(Timestamp.fromDate(afterTimestamp)));
+    }
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...(data as Log),
+        timestamp: data.timestamp.toDate(),
+      };
+    });
+  };
+
   async function addLog(log: LogDto) {
     try {
       const db = getFirestore();
@@ -165,6 +203,46 @@ const useFirestore = () => {
       console.log('Log posted successfully!');
     } catch (error) {
       console.error('Error posting log:', error);
+    }
+  }
+
+  async function deleteLogsInRange(startDate: string, endDate: string) {
+    try {
+      const db = getFirestore();
+      const logsRef = collection(db, 'logs');
+
+      const start = dayjs(startDate).startOf('day').toDate();
+      const end = dayjs(endDate).endOf('day').toDate();
+
+      const q = query(
+        logsRef,
+        where('timestamp', '>=', start),
+        where('timestamp', '<=', end),
+      );
+
+      const snapshot = await getDocs(q);
+
+      const batchSize = 500;
+      const totalDocs = snapshot.docs.length;
+      console.log(`삭제 대상 문서 수: ${totalDocs}개`);
+
+      for (let i = 0; i < totalDocs; i += batchSize) {
+        const batch = db.batch();
+        const chunk = snapshot.docs.slice(i, i + batchSize);
+
+        chunk.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+
+        await batch.commit();
+        console.log(`🔥 ${chunk.length}개 삭제 완료`);
+      }
+
+      console.log('✅ 로그 삭제 완료!');
+      return true;
+    } catch (error) {
+      console.error('❌ 로그 삭제 실패:', error);
+      return false;
     }
   }
 
@@ -177,6 +255,8 @@ const useFirestore = () => {
     updateSession,
     addLog,
     getLogs,
+    getLogsAfter,
+    deleteLogsInRange,
   };
 };
 
