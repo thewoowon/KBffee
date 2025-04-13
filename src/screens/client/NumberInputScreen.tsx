@@ -10,7 +10,7 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
-import {useAuth, useFirestore} from '../../hooks';
+import {useAuth, useFirestore, useAnalytics} from '../../hooks';
 import {
   CheckIcon,
   CircleXIcon,
@@ -18,10 +18,10 @@ import {
   XIcon,
 } from '../../components/Icons';
 import LinearGradient from 'react-native-linear-gradient';
-import {BackgroundDeco} from '../../components/background';
+// import {BackgroundDeco} from '../../components/background';
 import {useFocusEffect} from '@react-navigation/native';
 import {LoadingOverlay} from '../../components/overlay';
-// import DashboardView from './DashboardView';
+import DashboardView from './DashboardView';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -33,9 +33,14 @@ const NumberInputScreen = ({navigation}: any) => {
   const {storeCode} = useAuth();
   const [number, setNumber] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewModalContext, setViewModalContext] = useState({
+    visible: false,
+    phoneNumber: '',
+  });
   const [agree, setAgree] = useState(false);
-  const {addUser, getUser, updateSession} = useFirestore();
   const [isLoading, setIsLoading] = useState(false);
+  const {addUser, getUser, updateSession, deleteLogsInRange} = useFirestore();
+  const {logEvent} = useAnalytics();
 
   const onNumberPress = (value: number | string) => {
     if (value === 'c') {
@@ -53,6 +58,14 @@ const NumberInputScreen = ({navigation}: any) => {
   };
 
   const onConfirmPress = async () => {
+    try {
+      logEvent('phone_number_input_confirm', {
+        phone_number: `010${number}`,
+      });
+    } catch (error) {
+      console.error('Error logging event:', error);
+    }
+
     if (number.length < 8) {
       Alert.alert('전화번호를 모두 입력해주세요.');
       return;
@@ -80,9 +93,13 @@ const NumberInputScreen = ({navigation}: any) => {
       // 고객인 핸드폰 번호를 입력하고 -> 적립 상황판으로 이동하는
       mode: 'onboarding',
     });
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'Dashboard', params: {phoneNumber}}],
+    // navigation.reset({
+    //   index: 0,
+    //   routes: [{name: 'Dashboard', params: {phoneNumber}}],
+    // });
+    setViewModalContext({
+      visible: true,
+      phoneNumber,
     });
     setNumber('');
   };
@@ -112,10 +129,16 @@ const NumberInputScreen = ({navigation}: any) => {
       phone: phoneNumber,
       mode: 'onboarding',
     });
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'Dashboard', params: {phoneNumber}}],
+    // navigation.reset({
+    //   index: 0,
+    //   routes: [{name: 'Dashboard', params: {phoneNumber}}],
+    // });
+    setViewModalContext({
+      visible: true,
+      phoneNumber,
     });
+
+    setNumber('');
 
     setModalVisible(false);
   };
@@ -129,13 +152,6 @@ const NumberInputScreen = ({navigation}: any) => {
       });
     }, [storeCode]),
   );
-
-  useEffect(() => {
-    console.log('📱 NumberInputScreen mounted');
-    return () => {
-      console.log('🧹 NumberInputScreen unmounted');
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -338,7 +354,12 @@ const NumberInputScreen = ({navigation}: any) => {
             </View>
           </View>
         </View>
-        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          presentationStyle="overFullScreen" // or "pageSheet" 등 시도
+          supportedOrientations={['portrait', 'landscape']}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <View
@@ -364,7 +385,7 @@ const NumberInputScreen = ({navigation}: any) => {
                       styles.welcomeText,
                       {
                         color: '#FE7901',
-                        fontFamily: 'sf-ui-display-semibold',
+                        fontFamily: 'SFUIDisplay-Semibold',
                       },
                     ]}>
                     010{phoneNumberLabel()}
@@ -498,10 +519,23 @@ const NumberInputScreen = ({navigation}: any) => {
             </View>
           </View>
         </Modal>
-        {/* <Modal animationType="slide" transparent={true} visible={modalVisible}>
-          <DashboardView />
-        </Modal> */}
-        <BackgroundDeco />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={viewModalContext.visible}
+          presentationStyle="overFullScreen" // or "pageSheet" 등 시도
+          supportedOrientations={['portrait', 'landscape']}>
+          <DashboardView
+            phoneNumber={viewModalContext.phoneNumber}
+            onClose={() => {
+              setViewModalContext({
+                visible: false,
+                phoneNumber: '',
+              });
+            }}
+          />
+        </Modal>
+        {/* <BackgroundDeco /> */}
       </SafeAreaView>
     </View>
   );
@@ -510,6 +544,7 @@ const NumberInputScreen = ({navigation}: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // backgroundColor: '#FFFAE3',
   },
   backgroundStyle: {
     flex: 1,
@@ -573,7 +608,7 @@ const styles = StyleSheet.create({
   numberInputText: {
     fontSize: 38,
     color: '#4B4D55',
-    fontFamily: 'sf-ui-display-semibold',
+    fontFamily: 'SFUIDisplay-Semibold',
   },
   headerNumberContainer: {
     display: 'flex',
@@ -584,7 +619,7 @@ const styles = StyleSheet.create({
   headerNumberText: {
     fontSize: 38,
     color: '#191D2B',
-    fontFamily: 'sf-ui-display-semibold',
+    fontFamily: 'SFUIDisplay-Semibold',
     lineHeight: 48,
     letterSpacing: -1,
   },

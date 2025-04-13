@@ -1,6 +1,5 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  Animated,
   Pressable,
   SafeAreaView,
   StatusBar,
@@ -8,16 +7,15 @@ import {
   Text,
   View,
 } from 'react-native';
-import {useAuth, useFirestore} from '../../hooks';
+import {useAuth, useFirestore, useAnalytics} from '../../hooks';
 import {getFirestore, doc, onSnapshot} from '@react-native-firebase/firestore';
-import {useFocusEffect} from '@react-navigation/native';
 import {
   AmericanoIcon,
   BeverageIcon,
   LeftArrowIcon,
 } from '../../components/Icons';
 import {AnimatedBall} from '../../components/decorations';
-import {BackgroundDeco} from '../../components/background';
+// import {BackgroundDeco} from '../../components/background';
 
 // 총 13개까지
 const BALL_POSITIONS: {
@@ -53,8 +51,12 @@ const BALL_POSITIONS: {
   {position: {bottom: 193, right: -49}, color: '#FF515D', size: 140, zIndex: 1}, // 13
 ];
 
-const DashboardView = ({navigation, route}: any) => {
-  const phoneNumber = route.params?.phoneNumber;
+type DashboardViewProps = {
+  phoneNumber: string;
+  onClose: () => void;
+};
+
+const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
   const {storeCode} = useAuth();
   const [timeLeft, setTimeLeft] = useState(60);
   const [session, setSession] = useState<Session | null>(null);
@@ -66,6 +68,7 @@ const DashboardView = ({navigation, route}: any) => {
   const prevUserRef = useRef<User | null>(null);
 
   const {updateSession} = useFirestore();
+  const {logEvent} = useAnalytics();
 
   const phoneNumberLabel = () => {
     return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(
@@ -75,7 +78,12 @@ const DashboardView = ({navigation, route}: any) => {
   };
 
   const goBack = async () => {
-    setTimeLeft(3);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    setTimeLeft(0);
   };
 
   useEffect(() => {
@@ -107,9 +115,9 @@ const DashboardView = ({navigation, route}: any) => {
           return;
         }
 
-        if (userRef.current && userRef.current.stamps !== data.stamps) {
-          setTimeLeft(3); // 스탬프 변경 감지 → 타이머 조정
-        }
+        // if (userRef.current && userRef.current.stamps !== data.stamps) {
+        //   setTimeLeft(3); // 스탬프 변경 감지 → 타이머 조정
+        // }
 
         setPrevUser(userRef.current);
         setUser(data as User);
@@ -128,6 +136,7 @@ const DashboardView = ({navigation, route}: any) => {
     const sessionRef = doc(db, 'sessions', `session_${storeCode}`);
 
     const unsubscribe = onSnapshot(sessionRef, doc => {
+      console.log("'세션 리스너 작동 중...'");
       if (doc.exists) {
         const data = doc.data();
         console.log('Dashboard Current Session data: ', data);
@@ -137,7 +146,7 @@ const DashboardView = ({navigation, route}: any) => {
         }
 
         if (data.phone === '' && data.mode === 'waiting') {
-          setTimeLeft(3); // 즉시 종료 처리
+          setTimeLeft(3);
         }
 
         setSession(data as Session);
@@ -152,6 +161,15 @@ const DashboardView = ({navigation, route}: any) => {
   useEffect(() => {
     if (timeLeft === 0) {
       if (session && session.phone !== '') {
+        console.log('timer 세션 종료');
+        try {
+          logEvent('session_end', {
+            store_code: storeCode,
+            phone_number: session.phone,
+          });
+        } catch (error) {
+          console.log('Analytics error: ', error);
+        }
         updateSession(`session_${storeCode}`, {
           last_used: new Date().toISOString().split('T')[0],
           phone: '',
@@ -159,7 +177,7 @@ const DashboardView = ({navigation, route}: any) => {
         });
       }
 
-      navigation.replace('NumberInput');
+      onClose();
     }
   }, [timeLeft, session, storeCode]);
 
@@ -177,13 +195,6 @@ const DashboardView = ({navigation, route}: any) => {
       }
     };
   }, [timeLeft]);
-
-  useEffect(() => {
-    console.log('📱 DashboardScreen mounted');
-    return () => {
-      console.log('🧹 DashboardScreen unmounted');
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -293,7 +304,7 @@ const DashboardView = ({navigation, route}: any) => {
                         styles.labelSubText,
                         {
                           color: '#FE7901',
-                          fontFamily: 'sf-ui-display-semibold',
+                          fontFamily: 'SFUIDisplay-Semibold',
                         },
                       ]}>
                       {phoneNumberLabel()}
@@ -449,7 +460,7 @@ const DashboardView = ({navigation, route}: any) => {
             </View>
           </View>
         </View>
-        <BackgroundDeco />
+        {/* <BackgroundDeco /> */}
       </SafeAreaView>
     </View>
   );
@@ -458,9 +469,17 @@ const DashboardView = ({navigation, route}: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
   },
   backgroundStyle: {
     flex: 1,
+  },
+  innerContainer: {
+    flex: 1,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 24,
+    paddingBottom: 24,
   },
   flexBox: {
     display: 'flex',

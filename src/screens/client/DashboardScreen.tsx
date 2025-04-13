@@ -15,7 +15,7 @@ import {
   LeftArrowIcon,
 } from '../../components/Icons';
 import {AnimatedBall} from '../../components/decorations';
-import {BackgroundDeco} from '../../components/background';
+// import {BackgroundDeco} from '../../components/background';
 
 // 총 13개까지
 const BALL_POSITIONS: {
@@ -104,10 +104,10 @@ const DashboardScreen = ({navigation, route}: any) => {
           setUser(data as User);
           return;
         }
-
-        if (userRef.current && userRef.current.stamps !== data.stamps) {
-          setTimeLeft(3); // 스탬프 변경 감지 → 타이머 조정
-        }
+        // 스탬프 변경 감지
+        // if (userRef.current && userRef.current.stamps !== data.stamps) {
+        //   setTimeLeft(3); // 스탬프 변경 감지 → 타이머 조정
+        // }
 
         setPrevUser(userRef.current);
         setUser(data as User);
@@ -294,7 +294,7 @@ const DashboardScreen = ({navigation, route}: any) => {
                         styles.labelSubText,
                         {
                           color: '#FE7901',
-                          fontFamily: 'sf-ui-display-semibold',
+                          fontFamily: 'SFUIDisplay-Semibold',
                         },
                       ]}>
                       {phoneNumberLabel()}
@@ -450,7 +450,7 @@ const DashboardScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </View>
-        <BackgroundDeco />
+        {/* <BackgroundDeco /> */}
       </SafeAreaView>
     </View>
   );
