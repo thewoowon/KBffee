@@ -59,8 +59,8 @@ function App(): React.JSX.Element {
           },
         }}>
         <RootNavigator />
-        <Toast config={toastConfig} />
       </NavigationContainer>
+      <Toast config={toastConfig} />
     </GestureHandlerRootView>
   );
 }
