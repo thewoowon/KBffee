@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -8,7 +8,7 @@ import {
   View,
   Alert,
 } from 'react-native';
-import {useAuth, useFirestore} from '../../hooks';
+import {useAuth, useFirestore, useAnalytics} from '../../hooks';
 import {
   doc,
   getFirestore,
@@ -25,7 +25,6 @@ import {
 } from '../../components/Icons';
 import LinearGradient from 'react-native-linear-gradient';
 import {confirm} from '../../utils/alert';
-import Toast from 'react-native-toast-message';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -44,6 +43,7 @@ const DetailView = ({
   updateLogs: () => void;
 }) => {
   const {storeCode} = useAuth();
+  const {logEvent} = useAnalytics();
   // const [timeLeft, setTimeLeft] = useState(1000);
   const [number, setNumber] = useState('');
   const [user, setUser] = useState<User>({
@@ -53,6 +53,7 @@ const DetailView = ({
     phase: 'americano',
     americanoCoupons: 0,
     beverageCoupons: 0,
+    hasRated: false,
   });
 
   const [userContext, setUserContext] = useState<UserContext>({
@@ -69,6 +70,14 @@ const DetailView = ({
   const {updateUser, updateSession, addLog} = useFirestore();
 
   const handleApprove = async () => {
+    try {
+      logEvent('stamp_saved', {
+        phone_number: phoneNumber,
+      });
+    } catch (error) {
+      console.log('Error logging stamp saved event:', error);
+    }
+    console.log('handleApprove', phoneNumber, number);
     if (number.length === 0) {
       Alert.alert('적립할 스탬프를 입력해주세요', '다시 입력해주세요.');
       return;
@@ -129,26 +138,34 @@ const DetailView = ({
 
     setNumber('');
 
-    Toast.show({
-      type: 'custom_type',
-      text1: `스탬프 ${numberValue}개 적립되었습니다`,
-      text2: phoneNumber,
-      visibilityTime: 5000,
-      onPress: () => {
-        Toast.hide();
-      },
-    });
+    // Toast.show({
+    //   type: 'custom_type',
+    //   text1: `스탬프 ${numberValue}개 적립되었습니다`,
+    //   text2: phoneNumber,
+    //   visibilityTime: 5000,
+    //   onPress: () => {
+    //     Toast.hide();
+    //   },
+    // });
 
-    await updateSession(`session_${storeCode}`, {
-      last_used: new Date().toISOString().split('T')[0],
-      phone: '',
-      mode: 'waiting',
-    });
+    // await updateSession(`session_${storeCode}`, {
+    //   last_used: new Date().toISOString().split('T')[0],
+    //   phone: '',
+    //   mode: 'waiting',
+    // });
 
     updateLogs();
   };
 
   const handleUsing = async () => {
+    try {
+      logEvent('stamp_used', {
+        phone_number: phoneNumber,
+      });
+    } catch (error) {
+      console.log('Error logging stamp used event:', error);
+    }
+    console.log('handleUsing', phoneNumber, number);
     if (number.length === 0) {
       Alert.alert('사용할 쿠폰의 수를 입력해주세요', '다시 입력해주세요.');
       return;
@@ -207,26 +224,34 @@ const DetailView = ({
 
     setNumber('');
 
-    Toast.show({
-      type: 'custom_type',
-      text1: `스탬프 ${numberValue}개 사용되었습니다 - ${noteString}`,
-      text2: phoneNumber,
-      visibilityTime: 5000,
-      onPress: () => {
-        Toast.hide();
-      },
-    });
+    // Toast.show({
+    //   type: 'custom_type',
+    //   text1: `스탬프 ${numberValue}개 사용되었습니다 - ${noteString}`,
+    //   text2: phoneNumber,
+    //   visibilityTime: 5000,
+    //   onPress: () => {
+    //     Toast.hide();
+    //   },
+    // });
 
-    await updateSession(`session_${storeCode}`, {
-      last_used: new Date().toISOString().split('T')[0],
-      phone: '',
-      mode: 'waiting',
-    });
+    // await updateSession(`session_${storeCode}`, {
+    //   last_used: new Date().toISOString().split('T')[0],
+    //   phone: '',
+    //   mode: 'waiting',
+    // });
 
     updateLogs();
   };
 
   const refresh = async () => {
+    try {
+      logEvent('stamp_reset', {
+        phone_number: phoneNumber,
+      });
+    } catch (error) {
+      console.log('Error logging stamp reset event:', error);
+    }
+    console.log('refresh', phoneNumber);
     const result = await confirm('쿠폰 입력 확인', '쿠폰을 초기화하시겠어요?');
     if (!result) {
       return;
@@ -275,7 +300,7 @@ const DetailView = ({
     }
 
     if (typeof value === 'number') {
-      if (number.length > 2) {
+      if (number.length > 3) {
         Alert.alert(
           '적립하는 쿠폰의 수가 많은 것 같아요',
           '한 번 더 확인해주세요.',
@@ -297,7 +322,7 @@ const DetailView = ({
       }
 
       if (value === '+10') {
-        if (number.length > 2) {
+        if (number.length > 3) {
           Alert.alert(
             '적립하는 쿠폰의 수가 많은 것 같아요',
             '한 번 더 확인해주세요.',
@@ -321,13 +346,21 @@ const DetailView = ({
   };
 
   const close = async () => {
+    try {
+      logEvent('session_end', {
+        phone_number: phoneNumber,
+      });
+    } catch (error) {
+      console.log('Error logging session close event:', error);
+    }
+    console.log('close', phoneNumber);
     await updateSession(`session_${storeCode}`, {
       last_used: new Date().toISOString().split('T')[0],
       phone: '',
       mode: 'waiting',
     });
 
-    updateLogs();
+    // updateLogs();
   };
 
   // 무조건 10개씩 사용
@@ -466,7 +499,7 @@ const DetailView = ({
                       styles.labelSubText,
                       {
                         color: '#FE7901',
-                        fontFamily: 'sf-ui-display-semibold',
+                        fontFamily: 'SFUIDisplay-Semibold',
                       },
                     ]}>
                     {phoneNumberLabel()}
@@ -1022,7 +1055,7 @@ const styles = StyleSheet.create({
   numberInputText: {
     fontSize: 38,
     color: '#4B4D55',
-    fontFamily: 'sf-ui-display-semibold',
+    fontFamily: 'SFUIDisplay-Semibold',
   },
   headerNumberContainer: {
     display: 'flex',
@@ -1034,7 +1067,7 @@ const styles = StyleSheet.create({
   headerNumberText: {
     fontSize: 32,
     color: '#191D2B',
-    fontFamily: 'sf-ui-display-semibold',
+    fontFamily: 'SFUIDisplay-Semibold',
     lineHeight: 45,
   },
   divisor: {
@@ -1150,7 +1183,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     letterSpacing: -0.1,
-    fontFamily: 'sf-ui-display-semibold',
+    fontFamily: 'SFUIDisplay-Semibold',
   },
 });
 

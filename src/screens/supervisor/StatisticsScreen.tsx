@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import {BackgroundDeco} from '../../components/background';
+// import {BackgroundDeco} from '../../components/background';
 
 const StatisticsScreen = ({navigation, route}: any) => {
   return (
@@ -39,7 +39,7 @@ const StatisticsScreen = ({navigation, route}: any) => {
         <View style={styles.container}>
           <Text>Statistics Detail Screen</Text>
         </View>
-        <BackgroundDeco backgroundColor="#FFFAE3" />
+        {/* <BackgroundDeco backgroundColor="#FFFAE3" /> */}
       </SafeAreaView>
     </View>
   );

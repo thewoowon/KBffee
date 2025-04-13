@@ -11,7 +11,7 @@ import {
   View,
   // Modal,
 } from 'react-native';
-import {useAuth, useFirestore} from '../../hooks';
+import {useAuth, useFirestore, useAnalytics} from '../../hooks';
 import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {
@@ -21,21 +21,31 @@ import {
   ShortRightArrowIcon,
 } from '../../components/Icons';
 import dayjs from 'dayjs';
-import {BackgroundDeco} from '../../components/background';
+// import {BackgroundDeco} from '../../components/background';
 import DetailView from './DetailView';
 import {LoadingOverlay} from '../../components/overlay';
 
 const MainScreen = ({navigation, route}: any) => {
   const {storeCode} = useAuth();
-  const {enterNumber, getLogs} = useFirestore();
+  const {enterNumber, getLogs, getLogsAfter} = useFirestore();
   const {setIsAuthenticated, initStoreCode} = useAuth();
+  const {logEvent} = useAnalytics();
   const [modalVisible, setModalVisible] = useState(false);
   const [date, setDate] = useState(dayjs());
   const [logs, setLogs] = useState<Log[]>([]);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [lastTimestamp, setLastTimestamp] = useState<Date | null>(null);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      logEvent('logout', {
+        storeCode: storeCode,
+      });
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+
     setIsAuthenticated(false);
     initStoreCode('');
   };
@@ -61,14 +71,36 @@ const MainScreen = ({navigation, route}: any) => {
     setDate(date.add(value, 'day'));
   };
 
+  const handleSetToday = async () => {
+    logEvent('today', {
+      storeCode: storeCode,
+    });
+    setDate(dayjs());
+  };
+
   const updateLogs = async () => {
     const dateString = date.format('YYYY-MM-DD');
     setIsLoading(true);
     const logs = await getLogs(dateString);
-    setIsLoading(false);
     if (logs) {
       setLogs(logs);
+      setLastTimestamp(logs[0].timestamp); // 가장 최신 로그의 timestamp로 갱신
     }
+    setIsLoading(false);
+  };
+
+  const updateLogsAfter = async () => {
+    const dateString = date.format('YYYY-MM-DD');
+
+    // 마지막 로그 시간 이후의 로그만 가져오기
+    setIsLoading(true);
+    const newLogs = await getLogsAfter(dateString, lastTimestamp || undefined);
+    console.log('newLogs', newLogs);
+    if (newLogs && newLogs.length > 0) {
+      setLogs(prev => [...newLogs, ...prev]); // 시간순으로 정렬되어 있다면 prepend
+      setLastTimestamp(newLogs[0].timestamp); // 가장 최신 로그의 timestamp로 갱신
+    }
+    setIsLoading(false);
   };
 
   useFocusEffect(
@@ -76,11 +108,12 @@ const MainScreen = ({navigation, route}: any) => {
       const fetchLogs = async () => {
         const dateString = date.format('YYYY-MM-DD');
         setIsLoading(true);
+        // 일자가 변경되었을 경우에는 100개만 끊어서 최신으로 가져오기
         const logs = await getLogs(dateString);
-        setIsLoading(false);
         if (logs) {
           setLogs(logs);
         }
+        setIsLoading(false);
       };
       fetchLogs();
     }, [date]),
@@ -176,7 +209,7 @@ const MainScreen = ({navigation, route}: any) => {
                 ]}>
                 {date.format('YYYY-MM-DD') !== dayjs().format('YYYY-MM-DD') && (
                   <Pressable
-                    onPress={() => setDate(dayjs())}
+                    onPress={handleSetToday}
                     style={[
                       styles.flexRowBox,
                       {
@@ -392,7 +425,12 @@ const MainScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </View>
-        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          presentationStyle="overFullScreen" // or "pageSheet" 등 시도
+          supportedOrientations={['portrait', 'landscape']}>
           <DetailView
             navigation={navigation}
             phoneNumber={phoneNumber}
@@ -402,7 +440,7 @@ const MainScreen = ({navigation, route}: any) => {
             updateLogs={updateLogs}
           />
         </Modal>
-        <BackgroundDeco backgroundColor="#FFFAE3" />
+        {/* <BackgroundDeco backgroundColor="#FFFAE3" /> */}
       </SafeAreaView>
     </View>
   );
@@ -411,6 +449,7 @@ const MainScreen = ({navigation, route}: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFAE3',
   },
   backgroundStyle: {
     flex: 1,

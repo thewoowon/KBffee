@@ -24,7 +24,7 @@ import {
   LeftArrowIcon,
 } from '../../components/Icons';
 import LinearGradient from 'react-native-linear-gradient';
-import {BackgroundDeco} from '../../components/background';
+// import {BackgroundDeco} from '../../components/background';
 
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
@@ -44,6 +44,7 @@ const DetailScreen = ({navigation, route}: any) => {
     phase: 'americano',
     americanoCoupons: 0,
     beverageCoupons: 0,
+    hasRated: false,
   });
 
   const {updateUser, updateSession, addLog} = useFirestore();
@@ -357,7 +358,7 @@ const DetailScreen = ({navigation, route}: any) => {
                       styles.labelSubText,
                       {
                         color: '#FE7901',
-                        fontFamily: 'sf-ui-display-semibold',
+                        fontFamily: 'SFUIDisplay-Semibold',
                       },
                     ]}>
                     {phoneNumberLabel()}
@@ -620,7 +621,7 @@ const DetailScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </Modal> */}
-        <BackgroundDeco />
+        {/* <BackgroundDeco /> */}
       </SafeAreaView>
     </View>
   );
@@ -774,7 +775,7 @@ const styles = StyleSheet.create({
   numberInputText: {
     fontSize: 28,
     color: '#4B4D55',
-    fontFamily: 'sf-ui-display-semibold',
+    fontFamily: 'SFUIDisplay-Semibold',
   },
   headerNumberContainer: {
     display: 'flex',
@@ -786,7 +787,7 @@ const styles = StyleSheet.create({
   headerNumberText: {
     fontSize: 28,
     color: '#191D2B',
-    fontFamily: 'sf-ui-display-semibold',
+    fontFamily: 'SFUIDisplay-Semibold',
     lineHeight: 38,
   },
   divisor: {
