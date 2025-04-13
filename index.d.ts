@@ -20,6 +20,8 @@ interface User {
   phase: 'americano' | 'beverage';
   americanoCoupons: number;
   beverageCoupons: number;
+  // 별점을 위해 추가된 속성
+  hasRated?: boolean | null | undefined;
 }
 
 interface UserContext {
@@ -54,8 +56,13 @@ interface LogDto {
 }
 
 interface Session {
-  isConfirmed: boolean;
+  is_confirmed: boolean;
   last_used: string;
   phone: string;
   mode: string;
+}
+
+interface Rating {
+  stars: number;
+  createdAt: string;
 }
