@@ -195,6 +195,44 @@ const useFirestore = () => {
     });
   };
 
+  async function getLogsByPhoneNumber(phoneNumber: string): Promise<Log[]> {
+    try {
+      const db = getFirestore();
+      const logsRef = collection(db, 'logs');
+      // user count도 함께 가져오기
+      // const userCountRef = collection(db, 'users');
+      // const userCountSnapshot = await getCountFromServer(userCountRef);
+      // const userCount = userCountSnapshot.data().count;
+      // console.log('User Count:', userCount);
+
+      const logsQuery = query(
+        logsRef,
+        where('phone_number', '==', phoneNumber),
+        orderBy('timestamp', 'desc'), // 또는 'desc'
+        limit(50), // 최대 50개
+      );
+
+      const querySnapshot = await getDocs(logsQuery);
+
+      console.log('Logs fetched successfully!');
+
+      const logs =
+        querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...(data as Log),
+            timestamp: data.timestamp.toDate(),
+          };
+        }) || [];
+
+      return logs;
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+      return [];
+    }
+  }
+
   async function addLog(log: LogDto) {
     try {
       const db = getFirestore();
@@ -257,6 +295,7 @@ const useFirestore = () => {
     getLogs,
     getLogsAfter,
     deleteLogsInRange,
+    getLogsByPhoneNumber,
   };
 };
 
