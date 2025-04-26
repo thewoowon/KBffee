@@ -15,6 +15,8 @@ import {useAuth, useFirestore, useAnalytics} from '../../hooks';
 import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {
+  ExitIcon,
+  LeftArrowIcon,
   ProfileIcon,
   RefreshIcon,
   ShortLeftArrowIcon,
@@ -27,7 +29,8 @@ import {LoadingOverlay} from '../../components/overlay';
 
 const MainScreen = ({navigation, route}: any) => {
   const {storeCode} = useAuth();
-  const {enterNumber, getLogs, getLogsAfter} = useFirestore();
+  const {enterNumber, getLogs, getLogsAfter, getLogsByPhoneNumber} =
+    useFirestore();
   const {setIsAuthenticated, initStoreCode} = useAuth();
   const {logEvent} = useAnalytics();
   const [modalVisible, setModalVisible] = useState(false);
@@ -36,6 +39,15 @@ const MainScreen = ({navigation, route}: any) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [lastTimestamp, setLastTimestamp] = useState<Date | null>(null);
+  const [selectedContext, setSelectedContext] = useState<{
+    selectedLog: Log | null;
+    viewMode: 'detail' | 'list';
+    logList: Log[];
+  }>({
+    selectedLog: null,
+    viewMode: 'detail',
+    logList: [],
+  });
 
   const handleLogout = async () => {
     try {
@@ -76,6 +88,15 @@ const MainScreen = ({navigation, route}: any) => {
       storeCode: storeCode,
     });
     setDate(dayjs());
+  };
+
+  const handleClickLog = async (log: Log) => {
+    const logs = await getLogsByPhoneNumber(log.phone_number);
+    setSelectedContext({
+      selectedLog: log,
+      viewMode: 'detail',
+      logList: logs,
+    });
   };
 
   const updateLogs = async () => {
@@ -160,7 +181,12 @@ const MainScreen = ({navigation, route}: any) => {
           <View
             style={[
               styles.flexRowBox,
-              {justifyContent: 'flex-end', marginBottom: 12},
+              {
+                justifyContent: 'flex-end',
+                backgroundColor: '#3D4C57',
+                paddingVertical: 18,
+                paddingHorizontal: 24,
+              },
             ]}>
             <View style={[styles.flexRowBox, {gap: 8}]}>
               {/* <Pressable style={styles.button} onPress={handleStatistics}>
@@ -179,249 +205,674 @@ const MainScreen = ({navigation, route}: any) => {
           </View>
           <View
             style={[
-              styles.innerContainer,
+              styles.flexRowBox,
               {
-                backgroundColor: 'white',
-                borderRadius: 20,
-                gap: 20,
-                shadowColor: '#000000',
-                shadowOffset: {
-                  width: 0,
-                  height: 4.5,
-                },
-                shadowOpacity: 0.07,
-                shadowRadius: 22,
-                elevation: 6,
+                flex: 1,
               },
             ]}>
             <View
               style={[
-                styles.flexRowBox,
-                {justifyContent: 'space-between', paddingHorizontal: 12},
+                styles.innerContainer,
+                {
+                  backgroundColor: 'white',
+                  paddingHorizontal: 24,
+                  paddingTop: 32,
+                },
               ]}>
-              <Text style={styles.titleText}>적립내역</Text>
-              <View
-                style={[
-                  styles.flexRowBox,
-                  {
-                    gap: 18,
-                  },
-                ]}>
-                {date.format('YYYY-MM-DD') !== dayjs().format('YYYY-MM-DD') && (
-                  <Pressable
-                    onPress={handleSetToday}
-                    style={[
-                      styles.flexRowBox,
-                      {
-                        backgroundColor: '#F3F3F3',
-                        width: 70,
-                        height: 32,
-                        borderRadius: 6,
-                        gap: 4,
-                      },
-                    ]}>
-                    <RefreshIcon width={16} height={16} />
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        lineHeight: 26,
-                        letterSpacing: -1,
-                        fontFamily: 'Pretendard-Medium',
-                        color: '#595959',
-                      }}>
-                      오늘
-                    </Text>
-                  </Pressable>
-                )}
-                <View
-                  style={[
-                    styles.flexRowBox,
-                    {
-                      gap: 12,
-                    },
-                  ]}>
-                  <Pressable onPress={() => handleDateMinusChange(1)}>
-                    <ShortLeftArrowIcon width={24} height={24} />
-                  </Pressable>
-                  <Text
-                    style={{
-                      fontFamily: 'Pretendard-Medium',
-                      fontSize: 16,
-                      lineHeight: 26,
-                      letterSpacing: -1,
-                    }}>
-                    {date.format('MM월 DD일')}
-                  </Text>
-                  <Pressable onPress={() => handleDatePlusChange(1)}>
-                    <ShortRightArrowIcon width={24} height={24} />
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                paddingHorizontal: 12,
-              }}>
               <View
                 style={[
                   styles.flexRowBox,
                   {
                     justifyContent: 'space-between',
-                    height: 30,
-                    borderBottomWidth: 1,
-                    borderBottomColor: '#E5E5E5',
-                    gap: 16,
-                    marginBottom: 16,
+                    paddingHorizontal: 16,
+                    marginBottom: 32,
                   },
                 ]}>
+                <Text style={styles.titleText}>적립내역</Text>
                 <View
                   style={[
                     styles.flexRowBox,
-                    {justifyContent: 'flex-start', gap: 16, flex: 1},
+                    {
+                      gap: 18,
+                    },
                   ]}>
+                  {date.format('YYYY-MM-DD') !==
+                    dayjs().format('YYYY-MM-DD') && (
+                    <Pressable
+                      onPress={handleSetToday}
+                      style={[
+                        styles.flexRowBox,
+                        {
+                          backgroundColor: '#F3F3F3',
+                          width: 70,
+                          height: 32,
+                          borderRadius: 6,
+                          gap: 4,
+                        },
+                      ]}>
+                      <RefreshIcon width={16} height={16} />
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          lineHeight: 26,
+                          letterSpacing: -1,
+                          fontFamily: 'Pretendard-Medium',
+                          color: '#595959',
+                        }}>
+                        오늘
+                      </Text>
+                    </Pressable>
+                  )}
+                  <View
+                    style={[
+                      styles.flexRowBox,
+                      {
+                        gap: 12,
+                      },
+                    ]}>
+                    <Pressable onPress={() => handleDateMinusChange(1)}>
+                      <ShortLeftArrowIcon width={24} height={24} />
+                    </Pressable>
+                    <Text
+                      style={{
+                        fontFamily: 'Pretendard-Medium',
+                        fontSize: 16,
+                        lineHeight: 26,
+                        letterSpacing: -1,
+                      }}>
+                      {date.format('MM월 DD일')}
+                    </Text>
+                    <Pressable onPress={() => handleDatePlusChange(1)}>
+                      <ShortRightArrowIcon width={24} height={24} />
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  paddingHorizontal: 12,
+                }}>
+                <View
+                  style={[
+                    styles.flexRowBox,
+                    {
+                      justifyContent: 'space-between',
+                      height: 30,
+                      borderBottomWidth: 1,
+                      borderBottomColor: '#E5E5E5',
+                      gap: 16,
+                      marginBottom: 16,
+                    },
+                  ]}>
+                  <View
+                    style={[
+                      styles.flexRowBox,
+                      {justifyContent: 'flex-start', gap: 16, flex: 1},
+                    ]}>
+                    <Text
+                      style={{
+                        fontFamily: 'Pretendard-Medium',
+                        fontSize: 14,
+                        lineHeight: 24,
+                        letterSpacing: -1,
+                        width: 62,
+                        color: '#9F9FA6',
+                      }}>
+                      적립정보
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Pretendard-Medium',
+                        fontSize: 14,
+                        lineHeight: 24,
+                        letterSpacing: -1,
+                        width: 100,
+                        color: '#9F9FA6',
+                      }}>
+                      회원정보
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: 'Pretendard-Medium',
+                        fontSize: 14,
+                        lineHeight: 24,
+                        letterSpacing: -1,
+                        flex: 1,
+                        color: '#9F9FA6',
+                      }}>
+                      비고
+                    </Text>
+                  </View>
                   <Text
                     style={{
                       fontFamily: 'Pretendard-Medium',
                       fontSize: 14,
                       lineHeight: 24,
                       letterSpacing: -1,
-                      width: 62,
+                      width: 120,
                       color: '#9F9FA6',
                     }}>
-                    적립정보
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Pretendard-Medium',
-                      fontSize: 14,
-                      lineHeight: 24,
-                      letterSpacing: -1,
-                      width: 100,
-                      color: '#9F9FA6',
-                    }}>
-                    회원정보
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Pretendard-Medium',
-                      fontSize: 14,
-                      lineHeight: 24,
-                      letterSpacing: -1,
-                      flex: 1,
-                      color: '#9F9FA6',
-                    }}>
-                    비고
+                    일시
                   </Text>
                 </View>
-                <Text
-                  style={{
-                    fontFamily: 'Pretendard-Medium',
-                    fontSize: 14,
-                    lineHeight: 24,
-                    letterSpacing: -1,
-                    width: 120,
-                    color: '#9F9FA6',
-                  }}>
-                  일시
-                </Text>
-              </View>
-              <ScrollView style={styles.scrollView}>
-                <View
-                  style={{display: 'flex', flexDirection: 'column', gap: 16}}>
-                  {logs.length > 0 ? (
-                    logs.map((statistic, index) => (
-                      <View key={index} style={styles.listBox}>
-                        <View
-                          style={[
-                            styles.flexRowBox,
-                            {justifyContent: 'flex-start', gap: 16, flex: 1},
-                          ]}>
+                <ScrollView style={styles.scrollView}>
+                  <View
+                    style={{display: 'flex', flexDirection: 'column', gap: 16}}>
+                    {logs.length > 0 ? (
+                      logs.map((statistic, index) => (
+                        <Pressable
+                          key={index}
+                          style={styles.listBox}
+                          onPress={() => {
+                            handleClickLog(statistic);
+                          }}>
                           <View
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              borderRadius: 6,
-                              width: 62,
-                              height: 32,
-                              backgroundColor:
-                                statistic.action === 'stamp_saved'
-                                  ? '#FFEBD7'
-                                  : '#E8F1FF',
-                            }}>
+                            style={[
+                              styles.flexRowBox,
+                              {justifyContent: 'flex-start', gap: 16, flex: 1},
+                            ]}>
+                            <View
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: 6,
+                                width: 62,
+                                height: 32,
+                                backgroundColor:
+                                  statistic.action === 'stamp_saved'
+                                    ? '#FFEBD7'
+                                    : '#E8F1FF',
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 14,
+                                  lineHeight: 24,
+                                  letterSpacing: -1,
+                                  fontFamily: 'Pretendard-Medium',
+                                  color:
+                                    statistic.action === 'stamp_saved'
+                                      ? '#FF8400'
+                                      : '#3F8CFF',
+                                }}>
+                                {statistic.action === 'stamp_saved'
+                                  ? '적립'
+                                  : '사용'}{' '}
+                                {statistic.stamp}
+                              </Text>
+                            </View>
                             <Text
                               style={{
+                                width: 100,
+                                color: '#1B2128',
                                 fontSize: 14,
                                 lineHeight: 24,
                                 letterSpacing: -1,
                                 fontFamily: 'Pretendard-Medium',
-                                color:
-                                  statistic.action === 'stamp_saved'
-                                    ? '#FF8400'
-                                    : '#3F8CFF',
                               }}>
-                              {statistic.action === 'stamp_saved'
-                                ? '적립'
-                                : '사용'}{' '}
-                              {statistic.stamp}
+                              {
+                                // 3자리 , 4자리 ,4자리
+                                statistic.phone_number.replace(
+                                  /(\d{3})(\d{4})(\d{4})/,
+                                  '$1-$2-$3',
+                                )
+                              }
+                            </Text>
+                            <Text
+                              style={{
+                                color: 'black',
+                                fontSize: 14,
+                                lineHeight: 24,
+                                letterSpacing: -1,
+                                fontFamily: 'Pretendard-Light',
+                              }}>
+                              {statistic.note}
                             </Text>
                           </View>
                           <Text
                             style={{
-                              width: 100,
-                              color: '#1B2128',
+                              width: 120,
+                              color: '#878B8F',
+                              fontSize: 14,
+                              lineHeight: 24,
+                              letterSpacing: -1,
+                            }}>
+                            {dayjs(statistic.timestamp).format(
+                              'YYYY-MM-DD HH:mm',
+                            )}
+                          </Text>
+                        </Pressable>
+                      ))
+                    ) : (
+                      <View
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          height: 250,
+                        }}>
+                        <Text style={styles.emptyText}>
+                          적립내역이 없습니다.
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+            <View
+              style={[
+                styles.flexColumnBox,
+                {
+                  width: 536,
+                  height: '100%',
+                  backgroundColor: '#F6F6F6',
+                  paddingHorizontal: 24,
+                  paddingVertical: 32,
+                },
+              ]}>
+              {selectedContext.selectedLog ? (
+                selectedContext.viewMode === 'detail' ? (
+                  <View
+                    style={{
+                      flex: 1,
+                    }}>
+                    <View
+                      style={[
+                        styles.flexRowBox,
+                        {
+                          width: '100%',
+                          justifyContent: 'space-between',
+                          marginBottom: 36,
+                        },
+                      ]}>
+                      <Text
+                        style={{
+                          color: '#262626',
+                          fontFamily: 'Pretendard-Regular',
+                          fontSize: 16,
+                          lineHeight: 26,
+                          letterSpacing: -1,
+                        }}>
+                        적립내역 상세
+                      </Text>
+                      <Pressable
+                        onPress={() => {
+                          setSelectedContext({
+                            selectedLog: null,
+                            viewMode: 'detail',
+                            logList: [],
+                          });
+                        }}
+                        style={[
+                          styles.flexRowBox,
+                          {
+                            gap: 6,
+                          },
+                        ]}>
+                        <Text>나가기</Text>
+                        <ExitIcon />
+                      </Pressable>
+                    </View>
+                    <View
+                      style={[
+                        styles.flexRowBox,
+                        {
+                          marginBottom: 24,
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: 10,
+                        },
+                      ]}>
+                      <Text
+                        style={{
+                          color: '#262626',
+                          fontFamily: 'Pretendard-Regular',
+                          fontSize: 16,
+                          lineHeight: 26,
+                          letterSpacing: -1,
+                        }}>
+                        고객 번호
+                      </Text>
+                      <Text
+                        style={{
+                          color: '#FE7901',
+                          fontFamily: 'Pretendard-Medium',
+                          fontSize: 24,
+                          lineHeight: 32,
+                          letterSpacing: -1,
+                        }}>
+                        {selectedContext.selectedLog.phone_number.replace(
+                          /(\d{3})(\d{4})(\d{4})/,
+                          '$1-$2-$3',
+                        )}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        paddingVertical: 24,
+                        paddingHorizontal: 20,
+                        backgroundColor: 'white',
+                        borderRadius: 24,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 20,
+                      }}>
+                      <View
+                        style={[
+                          styles.flexRowBox,
+                          {
+                            justifyContent: 'space-between',
+                          },
+                        ]}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 6,
+                            width: 62,
+                            height: 32,
+                            backgroundColor:
+                              selectedContext.selectedLog.action ===
+                              'stamp_saved'
+                                ? '#FFEBD7'
+                                : '#E8F1FF',
+                          }}>
+                          <Text
+                            style={{
                               fontSize: 14,
                               lineHeight: 24,
                               letterSpacing: -1,
                               fontFamily: 'Pretendard-Medium',
+                              color:
+                                selectedContext.selectedLog.action ===
+                                'stamp_saved'
+                                  ? '#FF8400'
+                                  : '#3F8CFF',
                             }}>
-                            {
-                              // 3자리 , 4자리 ,4자리
-                              statistic.phone_number.replace(
-                                /(\d{3})(\d{4})(\d{4})/,
-                                '$1-$2-$3',
-                              )
-                            }
-                          </Text>
-                          <Text
-                            style={{
-                              color: 'black',
-                              fontSize: 14,
-                              lineHeight: 24,
-                              letterSpacing: -1,
-                              fontFamily: 'Pretendard-Light',
-                            }}>
-                            {statistic.note}
+                            {selectedContext.selectedLog.action ===
+                            'stamp_saved'
+                              ? '적립'
+                              : '사용'}{' '}
+                            {selectedContext.selectedLog.stamp}
                           </Text>
                         </View>
                         <Text
                           style={{
-                            width: 120,
-                            color: '#878B8F',
-                            fontSize: 14,
-                            lineHeight: 24,
+                            color: '#73777B',
+                            fontFamily: 'Pretendard-Regular',
+                            fontSize: 16,
+                            lineHeight: 26,
                             letterSpacing: -1,
                           }}>
-                          {dayjs(statistic.timestamp).format(
-                            'YYYY-MM-DD HH:mm',
+                          {dayjs(selectedContext.selectedLog.timestamp).format(
+                            `M월 D일 HH:mm`,
                           )}
                         </Text>
                       </View>
-                    ))
-                  ) : (
+                      <View
+                        style={[
+                          styles.flexRowBox,
+                          {
+                            justifyContent: 'space-between',
+                            paddingHorizontal: 12,
+                          },
+                        ]}>
+                        <Text
+                          style={{
+                            color: '#171717',
+                            fontFamily: 'Pretendard-Medium',
+                            fontSize: 16,
+                            lineHeight: 24,
+                            letterSpacing: -1,
+                          }}>
+                          {selectedContext.selectedLog.action === 'stamp_saved'
+                            ? '스탬프 적립'
+                            : selectedContext.selectedLog.note}
+                        </Text>
+                        <Text
+                          style={{
+                            color: '#171717',
+                            fontFamily: 'Pretendard-Medium',
+                            fontSize: 20,
+                            lineHeight: 24,
+                            letterSpacing: -1,
+                          }}>
+                          {selectedContext.selectedLog.action === 'stamp_saved'
+                            ? `+${selectedContext.selectedLog.stamp}`
+                            : `-${selectedContext.selectedLog.stamp}`}
+                        </Text>
+                      </View>
+                      <Pressable
+                        onPress={() => {
+                          setSelectedContext({
+                            ...selectedContext,
+                            viewMode: 'list',
+                          });
+                        }}
+                        style={[
+                          styles.flexRowBox,
+                          {
+                            borderRadius: 6,
+                            paddingVertical: 15,
+                            backgroundColor: '#EFEFEF',
+                            marginTop: 12,
+                            cursor: 'pointer',
+                          },
+                        ]}>
+                        <Text>모든내역보기</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flex: 1,
+                    }}>
+                    <View
+                      style={[
+                        styles.flexRowBox,
+                        {
+                          width: '100%',
+                          justifyContent: 'space-between',
+                          marginBottom: 36,
+                        },
+                      ]}>
+                      <Text
+                        style={{
+                          color: '#262626',
+                          fontFamily: 'Pretendard-Regular',
+                          fontSize: 16,
+                          lineHeight: 26,
+                          letterSpacing: -1,
+                        }}>
+                        적립내역 상세
+                      </Text>
+                      <Pressable
+                        onPress={() => {
+                          setSelectedContext({
+                            selectedLog: null,
+                            viewMode: 'detail',
+                            logList: [],
+                          });
+                        }}
+                        style={[
+                          styles.flexRowBox,
+                          {
+                            gap: 6,
+                          },
+                        ]}>
+                        <Text>나가기</Text>
+                        <ExitIcon />
+                      </Pressable>
+                    </View>
+                    <View
+                      style={[
+                        styles.flexRowBox,
+                        {
+                          marginBottom: 24,
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: 10,
+                        },
+                      ]}>
+                      <Text
+                        style={{
+                          color: '#262626',
+                          fontFamily: 'Pretendard-Regular',
+                          fontSize: 16,
+                          lineHeight: 26,
+                          letterSpacing: -1,
+                        }}>
+                        고객 번호
+                      </Text>
+                      <Text
+                        style={{
+                          color: '#FE7901',
+                          fontFamily: 'Pretendard-Medium',
+                          fontSize: 24,
+                          lineHeight: 32,
+                          letterSpacing: -1,
+                        }}>
+                        {selectedContext.selectedLog.phone_number.replace(
+                          /(\d{3})(\d{4})(\d{4})/,
+                          '$1-$2-$3',
+                        )}
+                      </Text>
+                    </View>
                     <View
                       style={{
+                        flex: 1,
+                        paddingVertical: 24,
+                        paddingHorizontal: 20,
+                        backgroundColor: 'white',
+                        borderRadius: 24,
                         display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: 250,
+                        flexDirection: 'column',
+                        gap: 20,
                       }}>
-                      <Text style={styles.emptyText}>적립내역이 없습니다.</Text>
+                      <Pressable
+                        style={[
+                          styles.flexRowBox,
+                          {gap: 7, justifyContent: 'flex-start'},
+                        ]}
+                        onPress={() => {
+                          setSelectedContext({
+                            ...selectedContext,
+                            viewMode: 'detail',
+                          });
+                        }}>
+                        <LeftArrowIcon />
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            fontFamily: 'Pretendard-Regular',
+                            color: '#191D2B',
+                            lineHeight: 26,
+                            letterSpacing: -1,
+                          }}>
+                          뒤로가기
+                        </Text>
+                      </Pressable>
+                      <ScrollView>
+                        {selectedContext.logList.map((log, index) => (
+                          <View key={index} style={[styles.listBox,{
+                            borderBottomWidth: 1,
+                            borderBottomColor: '#E5E5E5',
+                            paddingVertical: 16,
+                          }]}>
+                            <View
+                              style={[
+                                styles.flexRowBox,
+                                {
+                                  justifyContent: 'flex-start',
+                                  gap: 16,
+                                  flex: 1,
+                                },
+                              ]}>
+                              <View
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  borderRadius: 6,
+                                  width: 62,
+                                  height: 32,
+                                  backgroundColor:
+                                    log.action === 'stamp_saved'
+                                      ? '#FFEBD7'
+                                      : '#E8F1FF',
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 14,
+                                    lineHeight: 24,
+                                    letterSpacing: -1,
+                                    fontFamily: 'Pretendard-Medium',
+                                    color:
+                                      log.action === 'stamp_saved'
+                                        ? '#FF8400'
+                                        : '#3F8CFF',
+                                  }}>
+                                  {log.action === 'stamp_saved'
+                                    ? '적립'
+                                    : '사용'}{' '}
+                                  {log.stamp}
+                                </Text>
+                              </View>
+                              <Text
+                                style={{
+                                  color: 'black',
+                                  fontSize: 14,
+                                  lineHeight: 24,
+                                  letterSpacing: -1,
+                                  fontFamily: 'Pretendard-Light',
+                                }}>
+                                {log.note}
+                              </Text>
+                            </View>
+                            <Text
+                              style={{
+                                width: 120,
+                                color: '#878B8F',
+                                fontSize: 14,
+                                lineHeight: 24,
+                                letterSpacing: -1,
+                              }}>
+                              {dayjs(log.timestamp).format('YYYY-MM-DD HH:mm')}
+                            </Text>
+                          </View>
+                        ))}
+                      </ScrollView>
                     </View>
-                  )}
-                </View>
-              </ScrollView>
+                  </View>
+                )
+              ) : (
+                <>
+                  <Text
+                    style={{
+                      color: '#D4D4D4',
+                      fontFamily: 'Pretendard-Medium',
+                      fontSize: 20,
+                      lineHeight: 28,
+                      letterSpacing: -1,
+                    }}>
+                    내역을 선택하여
+                  </Text>
+                  <Text
+                    style={{
+                      color: '#D4D4D4',
+                      fontFamily: 'Pretendard-Medium',
+                      fontSize: 20,
+                      lineHeight: 28,
+                      letterSpacing: -1,
+                    }}>
+                    상세 적립내역을 확인할 수 있습니다
+                  </Text>
+                </>
+              )}
             </View>
           </View>
         </View>
@@ -449,17 +900,13 @@ const MainScreen = ({navigation, route}: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFAE3',
+    // backgroundColor: '#FFFAE3',
   },
   backgroundStyle: {
     flex: 1,
   },
   innerContainer: {
     flex: 1,
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingTop: 24,
-    paddingBottom: 24,
   },
   flexColumnBox: {
     flex: 1,

@@ -197,6 +197,22 @@ const NumberInputScreen = ({navigation}: any) => {
                   전화번호를 입력해주세요.
                 </Text>
               </View>
+              <View
+                style={[
+                  styles.labelBox,
+                  {
+                    marginTop: 10,
+                    marginBottom: 10,
+                  },
+                ]}>
+                <Text
+                  style={[
+                    styles.labelSubText,
+                    {fontSize: 16, lineHeight: 24, color: '#FC4A00'},
+                  ]}>
+                  © 2025 룰룰랄라 컴퍼니. All rights reserved.
+                </Text>
+              </View>
             </View>
             <View
               style={[
@@ -581,15 +597,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   labelTitleText: {
-    fontSize: 32,
+    fontSize: 36,
     fontFamily: 'Pretendard-Medium',
-    lineHeight: 45,
+    lineHeight: 48,
     letterSpacing: -1,
   },
   labelSubText: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: 'Pretendard-Light',
-    lineHeight: 28,
+    lineHeight: 32,
     letterSpacing: -1,
   },
   numberInputContainer: {

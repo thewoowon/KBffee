@@ -12,3 +12,4 @@ export {default as RefreshIcon} from './RefreshIcon';
 export {default as NewXIcon} from './NewXIcon';
 export {default as AmericanoIcon} from './AmericanoIcon';
 export {default as BeverageIcon} from './BeverageIcon';
+export {default as ExitIcon} from './ExitIcon';
