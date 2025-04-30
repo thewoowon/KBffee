@@ -14,7 +14,7 @@ import {useAuth, useFirestore, useAnalytics} from '../../hooks';
 import {
   CheckIcon,
   CircleXIcon,
-  LeftArrowIcon,
+  LeftBigArrowIcon,
   XIcon,
 } from '../../components/Icons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -170,32 +170,41 @@ const NumberInputScreen = ({navigation}: any) => {
                 flexDirection: 'row',
                 justifyContent: 'center',
               },
-              {gap: 110},
+              {gap: 60},
             ]}>
             <View
               style={[
                 styles.flexColumnBox,
                 {
-                  height: 'auto',
-                  gap: 10,
+                  height: '100%',
                   width: 340,
                   alignItems: 'flex-start',
-                  justifyContent: 'flex-start',
-                  paddingTop: 67,
+                  justifyContent: 'space-between',
+                  paddingTop: 134,
+                  paddingBottom: 134,
                 },
               ]}>
-              <View style={styles.labelBox}>
-                <Text style={styles.labelTitleText}>오늘도 찐~한 커피</Text>
-                <Text style={styles.labelTitleText}>한 잔 마시고</Text>
-                <Text style={styles.labelTitleText}>열심히 달려볼까요?</Text>
-              </View>
-              <View style={styles.subLabelBox}>
-                <Text style={styles.labelSubText}>
-                  스탬프 조회 또는 가입을 위해
-                </Text>
-                <Text style={styles.labelSubText}>
-                  전화번호를 입력해주세요.
-                </Text>
+              <View
+                style={[
+                  styles.flexColumnBox,
+                  {
+                    alignItems: 'flex-start',
+                    gap: 10,
+                  },
+                ]}>
+                <View style={styles.labelBox}>
+                  <Text style={styles.labelTitleText}>오늘도 찐~한 커피</Text>
+                  <Text style={styles.labelTitleText}>한 잔 마시고</Text>
+                  <Text style={styles.labelTitleText}>열심히 달려볼까요?</Text>
+                </View>
+                <View style={styles.subLabelBox}>
+                  <Text style={styles.labelSubText}>
+                    스탬프 조회 또는 가입을 위해
+                  </Text>
+                  <Text style={styles.labelSubText}>
+                    전화번호를 입력해주세요.
+                  </Text>
+                </View>
               </View>
               <View
                 style={[
@@ -218,154 +227,165 @@ const NumberInputScreen = ({navigation}: any) => {
               style={[
                 styles.flexColumnBox,
                 {
-                  paddingTop: 24,
-                  paddingLeft: 15,
-                  paddingRight: 15,
-                  borderRadius: 35,
-                  width: 420,
-                  height: 552,
-                  backgroundColor: '#ffffff',
-                  shadowColor: '#000000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 4.5,
-                  },
-                  shadowOpacity: 0.07,
-                  shadowRadius: 22,
+                  justifyContent: 'flex-end',
+                  height: '100%',
                 },
               ]}>
               <View
                 style={[
                   styles.flexColumnBox,
                   {
-                    width: 320,
-                    height: 'auto',
+                    paddingTop: 24,
+                    paddingLeft: 15,
+                    paddingRight: 15,
+                    borderTopLeftRadius: 32,
+                    borderTopRightRadius: 32,
+                    width: 533,
+                    height: 734,
+                    backgroundColor: '#ffffff',
+                    shadowColor: '#000000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 4.5,
+                    },
+                    shadowOpacity: 0.07,
+                    shadowRadius: 22,
+                    elevation: 6,
                   },
                 ]}>
                 <View
                   style={[
+                    styles.flexColumnBox,
                     {
-                      width: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      gap: 10,
-                      marginBottom: 20,
-                      paddingLeft: 9,
-                      paddingRight: 9,
+                      width: 485,
+                      height: 'auto',
                     },
                   ]}>
                   <View
                     style={[
-                      styles.headerNumberContainer,
                       {
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                        width: 376,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        gap: 20,
+                        marginBottom: 32,
+                        paddingLeft: 9,
+                        paddingRight: 9,
                       },
                     ]}>
-                    <View style={styles.headerNumberContainer}>
-                      <Text style={styles.headerNumberText}>010</Text>
-                      <Text style={styles.headerNumberText}>
-                        {phoneNumberLabel()}
-                      </Text>
-                    </View>
-                    {number.length > 0 && (
-                      <Pressable
-                        onPress={() => {
-                          setNumber('');
-                        }}>
-                        <CircleXIcon width={18} height={18} />
-                      </Pressable>
-                    )}
-                  </View>
-                  <View style={styles.divisor}></View>
-                </View>
-                <View
-                  style={[
-                    {
-                      width: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      gap: 12,
-                    },
-                  ]}>
-                  {NUMBER_SEQUENCE.map((row, rowIndex) => (
-                    <View key={rowIndex} style={styles.numberInputContainer}>
-                      {row.map((number, numberIndex) => (
+                    <View
+                      style={[
+                        styles.headerNumberContainer,
+                        {
+                          width: '100%',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        },
+                      ]}>
+                      <View style={styles.headerNumberContainer}>
+                        <Text style={styles.headerNumberText}>010</Text>
+                        <Text style={styles.headerNumberText}>
+                          {phoneNumberLabel()}
+                        </Text>
+                      </View>
+                      {number.length > 0 && (
                         <Pressable
-                          key={numberIndex}
-                          style={({pressed}) => [
-                            {
-                              backgroundColor: pressed ? '#EEEEEE' : '#fff',
-                              borderRadius: 10,
-                            },
-                            // 또는 추가 스타일이 있으면 아래처럼
-                            styles.numberInputButton,
-                          ]}
-                          onPress={() => onNumberPress(number)}>
-                          <Text style={styles.numberInputText}>{number}</Text>
+                          onPress={() => {
+                            setNumber('');
+                          }}>
+                          <CircleXIcon width={24} height={24} color="#97999D" />
                         </Pressable>
-                      ))}
+                      )}
                     </View>
-                  ))}
-                  <View style={styles.numberInputContainer}>
-                    <Pressable style={styles.numberInputButton}></Pressable>
-                    <Pressable
-                      style={({pressed}) => [
-                        {
-                          backgroundColor: pressed ? '#EEEEEE' : '#fff',
-                          borderRadius: 10,
-                        },
-                        // 또는 추가 스타일이 있으면 아래처럼
-                        styles.numberInputButton,
-                      ]}
-                      onPress={() => onNumberPress(0)}>
-                      <Text style={styles.numberInputText}>0</Text>
-                    </Pressable>
-                    <Pressable
-                      style={({pressed}) => [
-                        {
-                          backgroundColor: pressed ? '#EEEEEE' : '#fff',
-                          borderRadius: 10,
-                        },
-                        // 또는 추가 스타일이 있으면 아래처럼
-                        styles.numberInputButton,
-                      ]}
-                      onPress={() => onNumberPress('c')}>
-                      <LeftArrowIcon />
-                    </Pressable>
+                    <View style={styles.divisor}></View>
+                  </View>
+                  <View
+                    style={[
+                      {
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        gap: 12,
+                      },
+                    ]}>
+                    {NUMBER_SEQUENCE.map((row, rowIndex) => (
+                      <View key={rowIndex} style={styles.numberInputContainer}>
+                        {row.map((number, numberIndex) => (
+                          <Pressable
+                            key={numberIndex}
+                            style={({pressed}) => [
+                              {
+                                backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                                borderRadius: 10,
+                              },
+                              // 또는 추가 스타일이 있으면 아래처럼
+                              styles.numberInputButton,
+                            ]}
+                            onPress={() => onNumberPress(number)}>
+                            <Text style={styles.numberInputText}>{number}</Text>
+                          </Pressable>
+                        ))}
+                      </View>
+                    ))}
+                    <View style={styles.numberInputContainer}>
+                      <Pressable style={styles.numberInputButton}></Pressable>
+                      <Pressable
+                        style={({pressed}) => [
+                          {
+                            backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                            borderRadius: 10,
+                          },
+                          // 또는 추가 스타일이 있으면 아래처럼
+                          styles.numberInputButton,
+                        ]}
+                        onPress={() => onNumberPress(0)}>
+                        <Text style={styles.numberInputText}>0</Text>
+                      </Pressable>
+                      <Pressable
+                        style={({pressed}) => [
+                          {
+                            backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                            borderRadius: 10,
+                          },
+                          // 또는 추가 스타일이 있으면 아래처럼
+                          styles.numberInputButton,
+                        ]}
+                        onPress={() => onNumberPress('c')}>
+                        <LeftBigArrowIcon />
+                      </Pressable>
+                    </View>
                   </View>
                 </View>
-              </View>
-              <View style={styles.confirmContainer}>
-                <Pressable
-                  style={({pressed}) => [
-                    styles.confirmButton,
-                    {
-                      width: pressed ? 332 : 344,
-                    },
-                  ]}
-                  onPress={onConfirmPress}>
-                  <LinearGradient
-                    colors={['#FE8300', '#FC4A00']}
-                    locations={[0.3, 1]}
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 1}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 20,
-                    }}>
-                    <Text style={styles.confirmButtonText}>조회하기</Text>
-                  </LinearGradient>
-                </Pressable>
+                <View style={styles.confirmContainer}>
+                  <Pressable
+                    style={({pressed}) => [
+                      styles.confirmButton,
+                      {
+                        width: pressed ? 409 : 421,
+                      },
+                    ]}
+                    onPress={onConfirmPress}>
+                    <LinearGradient
+                      colors={['#FE8300', '#FC4A00']}
+                      locations={[0.3, 1]}
+                      start={{x: 0, y: 0}}
+                      end={{x: 1, y: 1}}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 20,
+                      }}>
+                      <Text style={styles.confirmButtonText}>조회하기</Text>
+                    </LinearGradient>
+                  </Pressable>
+                </View>
               </View>
             </View>
           </View>
@@ -612,19 +632,19 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 14,
+    gap: 16,
   },
   numberInputButton: {
     display: 'flex',
-    width: 84,
-    height: 56,
+    width: 151,
+    height: 77,
     justifyContent: 'center',
     alignItems: 'center',
   },
   numberInputText: {
-    fontSize: 38,
+    fontSize: 42,
     color: '#4B4D55',
-    fontFamily: 'SFUIDisplay-Semibold',
+    fontFamily: 'SFUIDisplay-Regular',
   },
   headerNumberContainer: {
     display: 'flex',
@@ -633,9 +653,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerNumberText: {
-    fontSize: 38,
+    fontSize: 44,
     color: '#191D2B',
-    fontFamily: 'SFUIDisplay-Semibold',
+    fontFamily: 'SFUIDisplay-Medium',
     lineHeight: 48,
     letterSpacing: -1,
   },
