@@ -105,6 +105,7 @@ const DetailView = ({
     const totalQuotient = Math.floor((user.stamps + numberValue) / 10);
     const difference = totalQuotient - currentQuotient;
 
+    let level = user.level;
     let phase = user.phase;
     let americanoCoupons = user.americanoCoupons;
     let beverageCoupons = user.beverageCoupons;
@@ -113,6 +114,7 @@ const DetailView = ({
       if (phase === 'americano') {
         americanoCoupons += 1;
         phase = 'beverage';
+        level += 1;
       } else {
         beverageCoupons += 1;
         phase = 'americano';
@@ -124,6 +126,7 @@ const DetailView = ({
       phase,
       americanoCoupons,
       beverageCoupons,
+      level,
     };
 
     await updateUser(phoneNumber, updateContext);

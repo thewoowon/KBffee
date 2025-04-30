@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   Alert,
   Modal,
@@ -8,6 +8,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   View,
   // Modal,
 } from 'react-native';
@@ -15,8 +16,10 @@ import {useAuth, useFirestore, useAnalytics} from '../../hooks';
 import {doc, getFirestore, onSnapshot} from '@react-native-firebase/firestore';
 import {useFocusEffect} from '@react-navigation/native';
 import {
+  DownTriangleIcon,
   ExitIcon,
   LeftArrowIcon,
+  MagnifierIcon,
   ProfileIcon,
   RefreshIcon,
   ShortLeftArrowIcon,
@@ -26,6 +29,25 @@ import dayjs from 'dayjs';
 // import {BackgroundDeco} from '../../components/background';
 import DetailView from './DetailView';
 import {LoadingOverlay} from '../../components/overlay';
+import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import Animated, {useSharedValue} from 'react-native-reanimated';
+
+const FILTER_LIST: {
+  label: string;
+  value: 'all' | 'used' | 'saved';
+}[] = [
+  {label: '전체', value: 'all'},
+  {label: '사용내역', value: 'used'},
+  {label: '적립내역', value: 'saved'},
+];
+
+const FILTER_MAP: {
+  [key: string]: string;
+} = {
+  all: '전체',
+  used: '사용내역',
+  saved: '적립내역',
+};
 
 const MainScreen = ({navigation, route}: any) => {
   const {storeCode} = useAuth();
@@ -36,6 +58,7 @@ const MainScreen = ({navigation, route}: any) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [date, setDate] = useState(dayjs());
   const [logs, setLogs] = useState<Log[]>([]);
+  const [displayLogs, setDisplayLogs] = useState<Log[]>([]);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [lastTimestamp, setLastTimestamp] = useState<Date | null>(null);
@@ -48,6 +71,23 @@ const MainScreen = ({navigation, route}: any) => {
     viewMode: 'detail',
     logList: [],
   });
+  const [searchContext, setSearchContext] = useState<{
+    searchText: string;
+    // 활성화  // 비활성화
+    status: 'active' | 'inactive';
+    filter: 'all' | 'used' | 'saved';
+  }>({
+    searchText: '',
+    status: 'inactive',
+    filter: 'all',
+  });
+  // BottomSheet 애니메이션 값을 관리하는 shared value
+  const bottomSheetTranslateY = useSharedValue(0);
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  // ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  // 바텀 시트의 snap 포인트 정의
+  const snapPoints = useMemo(() => [256], []);
 
   const handleLogout = async () => {
     try {
@@ -105,6 +145,7 @@ const MainScreen = ({navigation, route}: any) => {
     const logs = await getLogs(dateString);
     if (logs) {
       setLogs(logs);
+      setDisplayLogs(logs);
       setLastTimestamp(logs[0].timestamp); // 가장 최신 로그의 timestamp로 갱신
     }
     setIsLoading(false);
@@ -133,6 +174,7 @@ const MainScreen = ({navigation, route}: any) => {
         const logs = await getLogs(dateString);
         if (logs) {
           setLogs(logs);
+          setDisplayLogs(logs);
         }
         setIsLoading(false);
       };
@@ -219,50 +261,67 @@ const MainScreen = ({navigation, route}: any) => {
                   paddingTop: 32,
                 },
               ]}>
-              <View
-                style={[
-                  styles.flexRowBox,
-                  {
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 16,
-                    marginBottom: 32,
-                  },
-                ]}>
-                <Text style={styles.titleText}>적립내역</Text>
+              {searchContext.status === 'active' ? (
                 <View
                   style={[
                     styles.flexRowBox,
                     {
-                      gap: 18,
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 16,
+                      marginBottom: 32,
+                      gap: 16,
                     },
                   ]}>
-                  {date.format('YYYY-MM-DD') !==
-                    dayjs().format('YYYY-MM-DD') && (
-                    <Pressable
-                      onPress={handleSetToday}
-                      style={[
-                        styles.flexRowBox,
-                        {
-                          backgroundColor: '#F3F3F3',
-                          width: 70,
-                          height: 32,
-                          borderRadius: 6,
-                          gap: 4,
-                        },
-                      ]}>
-                      <RefreshIcon width={16} height={16} />
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          lineHeight: 26,
-                          letterSpacing: -1,
-                          fontFamily: 'Pretendard-Medium',
-                          color: '#595959',
-                        }}>
-                        오늘
-                      </Text>
-                    </Pressable>
-                  )}
+                  <Pressable
+                    style={styles.filterBox}
+                    onPress={() => {
+                      bottomSheetRef.current?.expand();
+                    }}>
+                    <Text style={styles.filterBoxText}>
+                      {FILTER_MAP[searchContext.filter]}
+                    </Text>
+                    <DownTriangleIcon />
+                  </Pressable>
+                  <TextInput
+                    value={searchContext.searchText}
+                    onChangeText={text => {
+                      setSearchContext({
+                        ...searchContext,
+                        searchText: text,
+                      });
+                    }}
+                    style={[
+                      styles.searchInput,
+                      {
+                        flex: 1,
+                      },
+                    ]}
+                  />
+                  <Pressable
+                    onPress={() => {
+                      setSearchContext({
+                        filter: 'all',
+                        searchText: '',
+                        status: 'inactive',
+                      });
+                      setDisplayLogs(logs);
+                    }}
+                    style={{
+                      width: 56,
+                    }}>
+                    <Text style={styles.filterBoxText}>취소</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <View
+                  style={[
+                    styles.flexRowBox,
+                    {
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 16,
+                      marginBottom: 32,
+                    },
+                  ]}>
                   <View
                     style={[
                       styles.flexRowBox,
@@ -270,24 +329,96 @@ const MainScreen = ({navigation, route}: any) => {
                         gap: 12,
                       },
                     ]}>
-                    <Pressable onPress={() => handleDateMinusChange(1)}>
-                      <ShortLeftArrowIcon width={24} height={24} />
-                    </Pressable>
-                    <Text
-                      style={{
-                        fontFamily: 'Pretendard-Medium',
-                        fontSize: 16,
-                        lineHeight: 26,
-                        letterSpacing: -1,
-                      }}>
-                      {date.format('MM월 DD일')}
-                    </Text>
-                    <Pressable onPress={() => handleDatePlusChange(1)}>
-                      <ShortRightArrowIcon width={24} height={24} />
-                    </Pressable>
+                    <View
+                      style={[
+                        styles.flexRowBox,
+                        {
+                          gap: 12,
+                        },
+                      ]}>
+                      <Text style={styles.titleText}>적립내역</Text>
+                      <Text style={styles.titleSideText}>{logs.length}건</Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.flexRowBox,
+                        {
+                          gap: 18,
+                        },
+                      ]}>
+                      {date.format('YYYY-MM-DD') !==
+                        dayjs().format('YYYY-MM-DD') && (
+                        <Pressable
+                          onPress={handleSetToday}
+                          style={[
+                            styles.flexRowBox,
+                            {
+                              backgroundColor: '#F3F3F3',
+                              width: 70,
+                              height: 32,
+                              borderRadius: 6,
+                              gap: 4,
+                            },
+                          ]}>
+                          <RefreshIcon width={16} height={16} />
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              lineHeight: 26,
+                              letterSpacing: -1,
+                              fontFamily: 'Pretendard-Medium',
+                              color: '#595959',
+                            }}>
+                            오늘
+                          </Text>
+                        </Pressable>
+                      )}
+                      <View
+                        style={[
+                          styles.flexRowBox,
+                          {
+                            gap: 12,
+                          },
+                        ]}>
+                        <Pressable onPress={() => handleDateMinusChange(1)}>
+                          <ShortLeftArrowIcon width={24} height={24} />
+                        </Pressable>
+                        <Text
+                          style={{
+                            fontFamily: 'Pretendard-Medium',
+                            fontSize: 16,
+                            lineHeight: 26,
+                            letterSpacing: -1,
+                          }}>
+                          {date.format('MM월 DD일')}
+                        </Text>
+                        <Pressable onPress={() => handleDatePlusChange(1)}>
+                          <ShortRightArrowIcon width={24} height={24} />
+                        </Pressable>
+                      </View>
+                    </View>
                   </View>
+                  <Pressable
+                    style={styles.searchInput}
+                    onPress={() => {
+                      setSearchContext({
+                        ...searchContext,
+                        status: 'active',
+                      });
+                    }}>
+                    <Text
+                      style={[
+                        styles.searchInputText,
+                        {
+                          color: '#CACACA',
+                        },
+                      ]}>
+                      고객번호로 내역검색
+                    </Text>
+                    <MagnifierIcon />
+                  </Pressable>
                 </View>
-              </View>
+              )}
               <View
                 style={{
                   flex: 1,
@@ -359,91 +490,99 @@ const MainScreen = ({navigation, route}: any) => {
                 <ScrollView style={styles.scrollView}>
                   <View
                     style={{display: 'flex', flexDirection: 'column', gap: 16}}>
-                    {logs.length > 0 ? (
-                      logs.map((statistic, index) => (
-                        <Pressable
-                          key={index}
-                          style={styles.listBox}
-                          onPress={() => {
-                            handleClickLog(statistic);
-                          }}>
-                          <View
-                            style={[
-                              styles.flexRowBox,
-                              {justifyContent: 'flex-start', gap: 16, flex: 1},
-                            ]}>
+                    {displayLogs.length > 0 ? (
+                      displayLogs
+                        .filter(log =>
+                          log.phone_number.startsWith(searchContext.searchText),
+                        )
+                        .map((statistic, index) => (
+                          <Pressable
+                            key={index}
+                            style={styles.listBox}
+                            onPress={() => {
+                              handleClickLog(statistic);
+                            }}>
                             <View
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderRadius: 6,
-                                width: 62,
-                                height: 32,
-                                backgroundColor:
-                                  statistic.action === 'stamp_saved'
-                                    ? '#FFEBD7'
-                                    : '#E8F1FF',
-                              }}>
+                              style={[
+                                styles.flexRowBox,
+                                {
+                                  justifyContent: 'flex-start',
+                                  gap: 16,
+                                  flex: 1,
+                                },
+                              ]}>
+                              <View
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  borderRadius: 6,
+                                  width: 62,
+                                  height: 32,
+                                  backgroundColor:
+                                    statistic.action === 'stamp_saved'
+                                      ? '#FFEBD7'
+                                      : '#E8F1FF',
+                                }}>
+                                <Text
+                                  style={{
+                                    fontSize: 14,
+                                    lineHeight: 24,
+                                    letterSpacing: -1,
+                                    fontFamily: 'Pretendard-Medium',
+                                    color:
+                                      statistic.action === 'stamp_saved'
+                                        ? '#FF8400'
+                                        : '#3F8CFF',
+                                  }}>
+                                  {statistic.action === 'stamp_saved'
+                                    ? '적립'
+                                    : '사용'}{' '}
+                                  {statistic.stamp}
+                                </Text>
+                              </View>
                               <Text
                                 style={{
+                                  width: 100,
+                                  color: '#1B2128',
                                   fontSize: 14,
                                   lineHeight: 24,
                                   letterSpacing: -1,
                                   fontFamily: 'Pretendard-Medium',
-                                  color:
-                                    statistic.action === 'stamp_saved'
-                                      ? '#FF8400'
-                                      : '#3F8CFF',
                                 }}>
-                                {statistic.action === 'stamp_saved'
-                                  ? '적립'
-                                  : '사용'}{' '}
-                                {statistic.stamp}
+                                {
+                                  // 3자리 , 4자리 ,4자리
+                                  statistic.phone_number.replace(
+                                    /(\d{3})(\d{4})(\d{4})/,
+                                    '$1-$2-$3',
+                                  )
+                                }
+                              </Text>
+                              <Text
+                                style={{
+                                  color: 'black',
+                                  fontSize: 14,
+                                  lineHeight: 24,
+                                  letterSpacing: -1,
+                                  fontFamily: 'Pretendard-Light',
+                                }}>
+                                {statistic.note}
                               </Text>
                             </View>
                             <Text
                               style={{
-                                width: 100,
-                                color: '#1B2128',
+                                width: 120,
+                                color: '#878B8F',
                                 fontSize: 14,
                                 lineHeight: 24,
                                 letterSpacing: -1,
-                                fontFamily: 'Pretendard-Medium',
                               }}>
-                              {
-                                // 3자리 , 4자리 ,4자리
-                                statistic.phone_number.replace(
-                                  /(\d{3})(\d{4})(\d{4})/,
-                                  '$1-$2-$3',
-                                )
-                              }
+                              {dayjs(statistic.timestamp).format(
+                                'YYYY-MM-DD HH:mm',
+                              )}
                             </Text>
-                            <Text
-                              style={{
-                                color: 'black',
-                                fontSize: 14,
-                                lineHeight: 24,
-                                letterSpacing: -1,
-                                fontFamily: 'Pretendard-Light',
-                              }}>
-                              {statistic.note}
-                            </Text>
-                          </View>
-                          <Text
-                            style={{
-                              width: 120,
-                              color: '#878B8F',
-                              fontSize: 14,
-                              lineHeight: 24,
-                              letterSpacing: -1,
-                            }}>
-                            {dayjs(statistic.timestamp).format(
-                              'YYYY-MM-DD HH:mm',
-                            )}
-                          </Text>
-                        </Pressable>
-                      ))
+                          </Pressable>
+                        ))
                     ) : (
                       <View
                         style={{
@@ -778,11 +917,16 @@ const MainScreen = ({navigation, route}: any) => {
                       </Pressable>
                       <ScrollView>
                         {selectedContext.logList.map((log, index) => (
-                          <View key={index} style={[styles.listBox,{
-                            borderBottomWidth: 1,
-                            borderBottomColor: '#E5E5E5',
-                            paddingVertical: 16,
-                          }]}>
+                          <View
+                            key={index}
+                            style={[
+                              styles.listBox,
+                              {
+                                borderBottomWidth: 1,
+                                borderBottomColor: '#E5E5E5',
+                                paddingVertical: 16,
+                              },
+                            ]}>
                             <View
                               style={[
                                 styles.flexRowBox,
@@ -876,6 +1020,109 @@ const MainScreen = ({navigation, route}: any) => {
             </View>
           </View>
         </View>
+        <BottomSheet
+          ref={bottomSheetRef}
+          // BottomSheet는 처음에 펼쳐진 상태로 시작
+          index={-1}
+          // 일단 스냅 포인트는 300, 550으로 설정
+          handleIndicatorStyle={{
+            display: 'none',
+          }}
+          containerStyle={{
+            zIndex: 3,
+          }}
+          // dim 처리
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          enableDynamicSizing={false}
+          onAnimate={(fromIndex, toIndex) => {
+            if (toIndex === 0) {
+              setCurrentIndex(0);
+              bottomSheetTranslateY.value = 0;
+            } else {
+              setCurrentIndex(-1);
+              bottomSheetTranslateY.value = 0;
+            }
+            ``;
+          }}>
+          <BottomSheetView
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              paddingHorizontal: 32,
+              paddingTop: 10,
+              paddingBottom: 44,
+              gap: 24,
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Pretendard-SemiBold ',
+                fontSize: 24,
+                lineHeight: 32,
+                letterSpacing: -1,
+                color: 'black',
+              }}>
+              내역 타입
+            </Text>
+            <View
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 20,
+              }}>
+              {FILTER_LIST.map((item, index) => {
+                return (
+                  <Pressable
+                    key={index}
+                    onPress={() => {
+                      setSearchContext({
+                        ...searchContext,
+                        filter: item.value,
+                      });
+                      if (item.value === 'all') {
+                        setDisplayLogs(logs);
+                      } else {
+                        setDisplayLogs(
+                          logs.filter(
+                            log => log.action === `stamp_${item.value}`,
+                          ),
+                        );
+                      }
+                      bottomSheetRef.current?.close();
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        lineHeight: 28,
+                        fontFamily: 'Pretendard-Regular',
+                        color:
+                          searchContext.filter === item.value
+                            ? '#FE7901'
+                            : 'black',
+                      }}>
+                      {item.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </BottomSheetView>
+        </BottomSheet>
+        {/* dim 처리 */}
+        <Animated.View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 2,
+            // bottomSheetRef가 열리면 dim 처리
+            display: currentIndex === 0 ? 'flex' : 'none',
+          }}
+          onTouchStart={() => {
+            bottomSheetRef.current?.close();
+          }}
+        />
         <Modal
           animationType="slide"
           transparent={true}
@@ -1002,12 +1249,56 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     letterSpacing: -1,
   },
+  titleSideText: {
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 16,
+    lineHeight: 26,
+    letterSpacing: -1,
+    color: '#8A8A8A',
+  },
   emptyText: {
     color: '#93989E',
     fontFamily: 'Pretendard-Regular',
     fontSize: 16,
     lineHeight: 24,
     letterSpacing: -1,
+  },
+  searchInput: {
+    width: 200,
+    height: 36,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#F8F8F8',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  searchInputText: {
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 16,
+    lineHeight: 20,
+    letterSpacing: -1,
+    color: '#232323',
+  },
+  filterBox: {
+    width: 100,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#EAEAEA',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  filterBoxText: {
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 16,
+    lineHeight: 20,
+    letterSpacing: -1,
+    color: '#383838',
   },
 });
 
