@@ -13,3 +13,6 @@ export {default as NewXIcon} from './NewXIcon';
 export {default as AmericanoIcon} from './AmericanoIcon';
 export {default as BeverageIcon} from './BeverageIcon';
 export {default as ExitIcon} from './ExitIcon';
+export {default as MagnifierIcon} from './MagnifierIcon';
+export {default as DownTriangleIcon} from './DownTriangleIcon';
+export {default as LeftBigArrowIcon} from './LeftBigArrowIcon';
