@@ -143,7 +143,7 @@ const useFirestore = () => {
         where('timestamp', '>=', start),
         where('timestamp', '<=', end),
         orderBy('timestamp', 'desc'), // 또는 'desc'
-        limit(50), // 최대 50개
+        limit(200), // 최대 50개
       );
 
       const querySnapshot = await getDocs(logsQuery);
