@@ -318,8 +318,12 @@ const MainScreen = ({navigation, route}: any) => {
                     styles.flexRowBox,
                     {
                       justifyContent: 'space-between',
-                      paddingHorizontal: 16,
                       marginBottom: 32,
+                      gap:
+                        date.format('YYYY-MM-DD') !==
+                        dayjs().format('YYYY-MM-DD')
+                          ? 10
+                          : 0,
                     },
                   ]}>
                   <View
@@ -399,7 +403,10 @@ const MainScreen = ({navigation, route}: any) => {
                     </View>
                   </View>
                   <Pressable
-                    style={styles.searchInput}
+                    style={[
+                      styles.searchInput,
+                      {flex: 1, maxWidth: 200, gap: 4},
+                    ]}
                     onPress={() => {
                       setSearchContext({
                         ...searchContext,
