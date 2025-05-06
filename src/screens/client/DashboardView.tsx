@@ -80,7 +80,7 @@ type DashboardViewProps = {
 
 const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
   const {storeCode} = useAuth();
-  const [timeLeft, setTimeLeft] = useState(6000);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [prevUser, setPrevUser] = useState<User | null>(null);
