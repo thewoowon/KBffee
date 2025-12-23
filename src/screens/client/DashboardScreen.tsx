@@ -16,6 +16,15 @@ import {
 } from '../../components/Icons';
 import {AnimatedBall} from '../../components/decorations';
 // import {BackgroundDeco} from '../../components/background';
+import LinearGradient from 'react-native-linear-gradient';
+
+const HOLIDAY_COLORS = {
+  backgroundStart: '#0B3D2E',
+  backgroundEnd: '#0D5C43',
+  accent: '#F2D16B',
+  primary: '#D7263D',
+  softMint: '#D7F0E2',
+};
 
 // 총 13개까지
 const BALL_POSITIONS: {
@@ -187,10 +196,12 @@ const DashboardScreen = ({navigation, route}: any) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={[HOLIDAY_COLORS.backgroundStart, HOLIDAY_COLORS.backgroundEnd]}
+      style={styles.container}>
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#6a51ae"
+        barStyle="light-content"
+        backgroundColor={HOLIDAY_COLORS.backgroundStart}
         translucent={false}
       />
       <SafeAreaView style={styles.backgroundStyle}>
@@ -217,13 +228,19 @@ const DashboardScreen = ({navigation, route}: any) => {
                     paddingTop: 104,
                   },
                 ]}>
+                <View style={styles.holidayBadge}>
+                  <Text style={styles.holidayBadgeText}>Warm wishes 🎄</Text>
+                  <Text style={styles.holidayBadgeSubText}>
+                    포근한 크리스마스 분위기에서 쉬어가세요
+                  </Text>
+                </View>
                 <View style={styles.labelBox}>
                   <Text style={styles.labelTitleText}>
                     <Text
                       style={[
                         styles.labelTitleText,
                         {
-                          color: '#FE7901',
+                          color: HOLIDAY_COLORS.accent,
                         },
                       ]}>
                       스탬프 {Math.abs(user.stamps - prevUser.stamps)}개
@@ -241,7 +258,7 @@ const DashboardScreen = ({navigation, route}: any) => {
                     style={[
                       styles.labelTitleText,
                       {
-                        color: '#FE7901',
+                        color: HOLIDAY_COLORS.accent,
                       },
                     ]}>
                     감사합니다
@@ -274,13 +291,19 @@ const DashboardScreen = ({navigation, route}: any) => {
                     paddingTop: 28,
                   },
                 ]}>
+                <View style={styles.holidayBadge}>
+                  <Text style={styles.holidayBadgeText}>Warm wishes 🎄</Text>
+                  <Text style={styles.holidayBadgeSubText}>
+                    포근한 크리스마스 분위기에서 쉬어가세요
+                  </Text>
+                </View>
                 <Pressable style={[styles.flexBox, {gap: 7}]} onPress={goBack}>
                   <LeftArrowIcon />
                   <Text
                     style={{
                       fontSize: 20,
                       fontFamily: 'Pretendard-Regular',
-                      color: '#191D2B',
+                      color: HOLIDAY_COLORS.softMint,
                       lineHeight: 28,
                       letterSpacing: -1,
                     }}>
@@ -293,7 +316,7 @@ const DashboardScreen = ({navigation, route}: any) => {
                       style={[
                         styles.labelSubText,
                         {
-                          color: '#FE7901',
+                          color: HOLIDAY_COLORS.accent,
                           fontFamily: 'SFUIDisplay-Semibold',
                         },
                       ]}>
@@ -452,7 +475,7 @@ const DashboardScreen = ({navigation, route}: any) => {
         </View>
         {/* <BackgroundDeco /> */}
       </SafeAreaView>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -462,6 +485,8 @@ const styles = StyleSheet.create({
   },
   backgroundStyle: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
   },
   flexBox: {
     display: 'flex',
@@ -488,6 +513,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-start',
     gap: 5,
+  },
+  holidayBadge: {
+    backgroundColor: 'rgba(242, 209, 107, 0.16)',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(242, 209, 107, 0.55)',
+    marginBottom: 10,
+    gap: 4,
+  },
+  holidayBadgeText: {
+    fontSize: 16,
+    fontFamily: 'Pretendard-SemiBold',
+    color: HOLIDAY_COLORS.accent,
+    letterSpacing: -0.5,
+  },
+  holidayBadgeSubText: {
+    fontSize: 12,
+    fontFamily: 'Pretendard-Regular',
+    color: HOLIDAY_COLORS.softMint,
   },
   subLabelBox: {
     display: 'flex',

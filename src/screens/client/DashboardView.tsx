@@ -14,7 +14,7 @@ import {
   BeverageIcon,
   LeftArrowIcon,
 } from '../../components/Icons';
-import {AnimatedBall} from '../../components/decorations';
+import {AnimatedBall, SnowflakeEffect} from '../../components/decorations';
 import {
   AmericanoCouponOverlay,
   AmericanoOneOverlay,
@@ -24,6 +24,15 @@ import {
   BeverageTwoOverlay,
 } from '../../components/overlay';
 // import {BackgroundDeco} from '../../components/background';
+import LinearGradient from 'react-native-linear-gradient';
+
+const HOLIDAY_COLORS = {
+  backgroundStart: '#0B3D2E',
+  backgroundEnd: '#0D5C43',
+  accent: '#F2D16B',
+  primary: '#D7263D',
+  softMint: '#D7F0E2',
+};
 
 // 총 13개까지
 const BALL_POSITIONS: {
@@ -286,13 +295,16 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
   }, [timeLeft]);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={[HOLIDAY_COLORS.backgroundStart, HOLIDAY_COLORS.backgroundEnd]}
+      style={styles.container}>
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#6a51ae"
+        barStyle="light-content"
+        backgroundColor={HOLIDAY_COLORS.backgroundStart}
         translucent={false}
       />
       <SafeAreaView style={styles.backgroundStyle}>
+        <SnowflakeEffect count={25} />
         <View style={[styles.flexRowBox]}>
           <View
             style={[
@@ -323,7 +335,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                       style={[
                         styles.labelTitleText,
                         {
-                          color: '#FE7901',
+                          color: HOLIDAY_COLORS.accent,
                         },
                       ]}>
                       스탬프 {Math.abs(user.stamps - prevUser.stamps)}개
@@ -341,7 +353,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                     style={[
                       styles.labelTitleText,
                       {
-                        color: '#FE7901',
+                        color: HOLIDAY_COLORS.accent,
                       },
                     ]}>
                     감사합니다
@@ -381,7 +393,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                     style={{
                       fontSize: 20,
                       fontFamily: 'Pretendard-Regular',
-                      color: '#191D2B',
+                      color: HOLIDAY_COLORS.softMint,
                       lineHeight: 28,
                       letterSpacing: -1,
                     }}>
@@ -394,7 +406,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                       style={[
                         styles.labelSubText,
                         {
-                          color: '#FE7901',
+                          color: HOLIDAY_COLORS.accent,
                           fontFamily: 'SFUIDisplay-Semibold',
                         },
                       ]}>
@@ -432,7 +444,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                             gap: 4,
                             alignItems: 'center',
                           }}>
-                          <BeverageIcon color="#FF8400" />
+                          <BeverageIcon color={HOLIDAY_COLORS.accent} />
                           <Text style={styles.beverageTitleText}>
                             조제음료 {user.beverageCoupons}잔 무료로 사용
                             가능해요!
@@ -454,7 +466,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                             gap: 4,
                             alignItems: 'center',
                           }}>
-                          <AmericanoIcon color="#FF8400" />
+                          <AmericanoIcon color={HOLIDAY_COLORS.accent} />
                           <Text style={styles.beverageTitleText}>
                             아메리카노 {user.americanoCoupons}잔 무료로 사용
                             가능해요!
@@ -520,7 +532,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                       style={[
                         styles.labelSubText,
                         {
-                          color: '#424756',
+                          color: HOLIDAY_COLORS.primary,
                         },
                       ]}>
                       현재 보유 스탬프
@@ -564,17 +576,18 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
         {/* <BackgroundDeco /> */}
       </SafeAreaView>
       {showOverlay(dStampOverlayContext)}
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
   },
   backgroundStyle: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
   },
   innerContainer: {
     flex: 1,
@@ -609,6 +622,65 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 5,
   },
+  santaCard: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(242, 209, 107, 0.4)',
+  },
+  santaIconWrapper: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(215, 240, 226, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  santaIcon: {
+    fontSize: 30,
+    color: HOLIDAY_COLORS.accent,
+  },
+  santaTextWrapper: {
+    flexShrink: 1,
+    gap: 2,
+  },
+  santaTitle: {
+    fontSize: 17,
+    fontFamily: 'SFUIDisplay-Semibold',
+    color: '#F6F0DF',
+  },
+  santaSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Pretendard-Regular',
+    color: 'rgba(225, 240, 232, 0.82)',
+    lineHeight: 20,
+  },
+  holidayBadge: {
+    backgroundColor: 'rgba(242, 209, 107, 0.16)',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(242, 209, 107, 0.55)',
+    marginBottom: 10,
+    gap: 4,
+  },
+  holidayBadgeText: {
+    fontSize: 16,
+    fontFamily: 'Pretendard-SemiBold',
+    color: HOLIDAY_COLORS.accent,
+    letterSpacing: -0.5,
+  },
+  holidayBadgeSubText: {
+    fontSize: 12,
+    fontFamily: 'Pretendard-Regular',
+    color: HOLIDAY_COLORS.softMint,
+  },
   subLabelBox: {
     display: 'flex',
     flexDirection: 'column',
@@ -620,19 +692,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Medium',
     lineHeight: 45,
     letterSpacing: -1,
+    color: HOLIDAY_COLORS.softMint,
   },
   labelSubText: {
     fontSize: 20,
     fontFamily: 'Pretendard-Regular',
     lineHeight: 28,
     letterSpacing: -1,
+    color: 'rgba(225, 240, 232, 0.9)',
   },
   stampLeftText: {
     fontSize: 76,
     fontFamily: 'Pretendard-Medium',
     lineHeight: 86,
     letterSpacing: -1,
-    color: '#FF8400',
+    color: HOLIDAY_COLORS.accent,
   },
   stampRightText: {
     fontSize: 28,
@@ -652,7 +726,7 @@ const styles = StyleSheet.create({
   beverageBox: {
     width: '100%',
     height: 98,
-    backgroundColor: '#F2F2F2',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 16,
@@ -665,14 +739,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 28,
     fontFamily: 'Pretendard-Medium',
-    color: '#1E1E1E',
+    color: HOLIDAY_COLORS.softMint,
     letterSpacing: -1,
   },
   beverageBodyText: {
     fontSize: 16,
     lineHeight: 26,
     fontFamily: 'Pretendard-Regular',
-    color: '#838383',
+    color: 'rgba(215, 240, 226, 0.9)',
     letterSpacing: -1,
   },
 });

@@ -23,6 +23,14 @@ import {useFocusEffect} from '@react-navigation/native';
 import {LoadingOverlay} from '../../components/overlay';
 import DashboardView from './DashboardView';
 
+const HOLIDAY_COLORS = {
+  backgroundStart: '#0B3D2E',
+  backgroundEnd: '#0D5C43',
+  accent: '#F2D16B',
+  primary: '#D7263D',
+  softMint: '#D7F0E2',
+};
+
 const NUMBER_SEQUENCE = [
   [1, 2, 3],
   [4, 5, 6],
@@ -154,10 +162,12 @@ const NumberInputScreen = ({navigation}: any) => {
   );
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+    colors={[HOLIDAY_COLORS.backgroundStart, HOLIDAY_COLORS.backgroundEnd]}
+    style={styles.container}>
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#6a51ae"
+        barStyle="light-content"
+        backgroundColor={HOLIDAY_COLORS.backgroundStart}
         translucent={false}
       />
       <SafeAreaView style={styles.backgroundStyle}>
@@ -192,6 +202,23 @@ const NumberInputScreen = ({navigation}: any) => {
                     gap: 10,
                   },
                 ]}>
+                  <View style={styles.santaCard}>
+                  <View style={styles.santaIconWrapper}>
+                    <Text style={styles.santaIcon}>🎅</Text>
+                  </View>
+                  <View style={styles.santaTextWrapper}>
+                    <Text style={styles.santaTitle}>산타가 전하는 따뜻한 한 잔</Text>
+                    <Text style={styles.santaSubtitle}>
+                      방문해 주신 고객님께 감사드리며, 행복한 연말 되시길 바랍니다!
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.holidayBadge}>
+                  <Text style={styles.holidayBadgeText}>Merry Christmas</Text>
+                  <Text style={styles.holidayBadgeSubText}>
+                    포근한 공간에서 한 잔을 더 즐겨요
+                  </Text>
+                </View>
                 <View style={styles.labelBox}>
                   <Text style={styles.labelTitleText}>오늘도 찐~한 커피</Text>
                   <Text style={styles.labelTitleText}>한 잔 마시고</Text>
@@ -319,7 +346,9 @@ const NumberInputScreen = ({navigation}: any) => {
                             key={numberIndex}
                             style={({pressed}) => [
                               {
-                                backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                                backgroundColor: pressed
+                                ? '#E3F2E8'
+                                : 'rgba(255, 255, 255, 0.96)',
                                 borderRadius: 10,
                               },
                               // 또는 추가 스타일이 있으면 아래처럼
@@ -336,7 +365,9 @@ const NumberInputScreen = ({navigation}: any) => {
                       <Pressable
                         style={({pressed}) => [
                           {
-                            backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                            backgroundColor: pressed
+                              ? '#E3F2E8'
+                              : 'rgba(255, 255, 255, 0.96)',
                             borderRadius: 10,
                           },
                           // 또는 추가 스타일이 있으면 아래처럼
@@ -348,7 +379,9 @@ const NumberInputScreen = ({navigation}: any) => {
                       <Pressable
                         style={({pressed}) => [
                           {
-                            backgroundColor: pressed ? '#EEEEEE' : '#fff',
+                            backgroundColor: pressed
+                              ? '#E3F2E8'
+                              : 'rgba(255, 255, 255, 0.96)',
                             borderRadius: 10,
                           },
                           // 또는 추가 스타일이 있으면 아래처럼
@@ -370,8 +403,8 @@ const NumberInputScreen = ({navigation}: any) => {
                     ]}
                     onPress={onConfirmPress}>
                     <LinearGradient
-                      colors={['#FE8300', '#FC4A00']}
-                      locations={[0.3, 1]}
+                      colors={[HOLIDAY_COLORS.primary, HOLIDAY_COLORS.primary]}
+                      locations={[0.2, 1]}
                       start={{x: 0, y: 0}}
                       end={{x: 1, y: 1}}
                       style={{
@@ -510,14 +543,16 @@ const NumberInputScreen = ({navigation}: any) => {
                   style={{
                     width: '100%',
                     display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    gap: 6,
-                    paddingLeft: 16,
-                  }}
-                  onPress={() => setAgree(!agree)}>
-                  <CheckIcon color={agree ? '#0090FE' : '#CFCFCF'} />
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 6,
+                  paddingLeft: 16,
+                }}
+                onPress={() => setAgree(!agree)}>
+                  <CheckIcon
+                    color={agree ? HOLIDAY_COLORS.primary : '#CFCFCF'}
+                  />
                   <Text style={styles.bottomText}>
                     이용약관을 모두 읽었으며 해당 내용에 모두 동의합니다.
                   </Text>
@@ -527,15 +562,19 @@ const NumberInputScreen = ({navigation}: any) => {
                     styles.confirmButton,
                     {
                       width: pressed ? '98%' : '100%',
-                      backgroundColor: agree ? '#FE8300' : '#CFCFCF',
-                      shadowOpacity: agree ? 0.5 : 0,
+                      backgroundColor: agree
+                        ? HOLIDAY_COLORS.primary
+                        : '#CFCFCF',
+                      shadowOpacity: agree ? 0.45 : 0,
                     },
                   ]}
                   onPress={onAgreePress}
                   disabled={!agree}>
                   <LinearGradient
                     colors={
-                      agree ? ['#FE8300', '#FC4A00'] : ['#EDEDED', '#EDEDED']
+                      agree
+                        ? [HOLIDAY_COLORS.primary, HOLIDAY_COLORS.accent]
+                        : ['#EDEDED', '#EDEDED']
                     }
                     locations={[0.3, 1]}
                     start={{x: 0, y: 0}}
@@ -573,7 +612,7 @@ const NumberInputScreen = ({navigation}: any) => {
         </Modal>
         {/* <BackgroundDeco /> */}
       </SafeAreaView>
-    </View>
+      </LinearGradient>
   );
 };
 
@@ -584,6 +623,8 @@ const styles = StyleSheet.create({
   },
   backgroundStyle: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
   },
   flexCenter: {
     flex: 1,
@@ -610,6 +651,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
+  holidayBadge: {
+    backgroundColor: 'rgba(242, 209, 107, 0.16)',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(242, 209, 107, 0.55)',
+    marginBottom: 10,
+    gap: 4,
+  },
+  holidayBadgeText: {
+    fontSize: 16,
+    fontFamily: 'Pretendard-SemiBold',
+    color: HOLIDAY_COLORS.accent,
+    letterSpacing: -0.5,
+  },
+  holidayBadgeSubText: {
+    fontSize: 12,
+    fontFamily: 'Pretendard-Regular',
+    color: HOLIDAY_COLORS.softMint,
+  },
   subLabelBox: {
     display: 'flex',
     flexDirection: 'column',
@@ -621,12 +683,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Medium',
     lineHeight: 48,
     letterSpacing: -1,
+    color: HOLIDAY_COLORS.softMint,
   },
   labelSubText: {
     fontSize: 24,
     fontFamily: 'Pretendard-Light',
     lineHeight: 32,
     letterSpacing: -1,
+    color: 'rgba(225, 240, 232, 0.9)',
   },
   numberInputContainer: {
     width: '100%',
@@ -643,7 +707,7 @@ const styles = StyleSheet.create({
   },
   numberInputText: {
     fontSize: 42,
-    color: '#4B4D55',
+    color: '#0E4132',
     fontFamily: 'SFUIDisplay-Regular',
   },
   headerNumberContainer: {
@@ -654,10 +718,48 @@ const styles = StyleSheet.create({
   },
   headerNumberText: {
     fontSize: 44,
-    color: '#191D2B',
+    color: HOLIDAY_COLORS.backgroundStart,
     fontFamily: 'SFUIDisplay-Medium',
     lineHeight: 48,
     letterSpacing: -1,
+  },
+  santaCard: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(242, 209, 107, 0.4)',
+  },
+  santaIconWrapper: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(215, 240, 226, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  santaIcon: {
+    fontSize: 30,
+    color: HOLIDAY_COLORS.accent,
+  },
+  santaTextWrapper: {
+    flexShrink: 1,
+    gap: 2,
+  },
+  santaTitle: {
+    fontSize: 17,
+    fontFamily: 'SFUIDisplay-Semibold',
+    color: '#F6F0DF',
+  },
+  santaSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Pretendard-Regular',
+    color: 'rgba(225, 240, 232, 0.82)',
+    lineHeight: 20,
   },
   confirmContainer: {
     width: '100%',
@@ -672,10 +774,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 344,
     height: 64,
-    backgroundColor: '#FE8300',
+    backgroundColor: HOLIDAY_COLORS.primary,
     borderRadius: 24,
     // shadow
-    shadowColor: '#FE6D00',
+    shadowColor: HOLIDAY_COLORS.accent,
     shadowOffset: {
       width: 0,
       height: 4.5,
@@ -692,7 +794,7 @@ const styles = StyleSheet.create({
   divisor: {
     width: '100%',
     height: 0.5,
-    backgroundColor: '#E0E0E9',
+    backgroundColor: '#D7E7DB',
   },
   centeredView: {
     flex: 1,
@@ -703,7 +805,9 @@ const styles = StyleSheet.create({
   modalView: {
     height: 450,
     width: 634,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderColor: HOLIDAY_COLORS.accent,
+    borderWidth: 1,
     borderRadius: 24,
     padding: 24,
     alignItems: 'center',
@@ -763,25 +867,27 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 28,
     fontFamily: 'Pretendard-Medium',
+    color: '#0E4132',
   },
   titleText: {
     width: '100%',
     fontSize: 28,
     lineHeight: 38,
     fontFamily: 'Pretendard-Medium',
+    color: '#0E4132',
   },
   subtitleText: {
     width: '100%',
     fontSize: 14,
     lineHeight: 24,
     fontFamily: 'Pretendard-Regular',
-    color: '#7F838E',
+    color: '#3E5F51',
   },
   bottomText: {
     fontSize: 14,
     lineHeight: 22,
     fontFamily: 'Pretendard-Regular',
-    color: '#191D2B',
+    color: '#0E4132',
   },
 });
 
