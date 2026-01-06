@@ -23,12 +23,13 @@ import {useFocusEffect} from '@react-navigation/native';
 import {LoadingOverlay} from '../../components/overlay';
 import DashboardView from './DashboardView';
 
-const HOLIDAY_COLORS = {
-  backgroundStart: '#0B3D2E',
-  backgroundEnd: '#0D5C43',
-  accent: '#F2D16B',
-  primary: '#D7263D',
-  softMint: '#D7F0E2',
+const WINTER_COLORS = {
+  backgroundStart: '#1A2332',
+  backgroundEnd: '#2D4159',
+  accent: '#A8D8EA',
+  primary: '#E8F4F8',
+  iceBlue: '#C8D6E5',
+  deepSnow: '#F0F8FF',
 };
 
 const NUMBER_SEQUENCE = [
@@ -163,11 +164,11 @@ const NumberInputScreen = ({navigation}: any) => {
 
   return (
     <LinearGradient
-    colors={[HOLIDAY_COLORS.backgroundStart, HOLIDAY_COLORS.backgroundEnd]}
+    colors={[WINTER_COLORS.backgroundStart, WINTER_COLORS.backgroundEnd]}
     style={styles.container}>
       <StatusBar
         barStyle="light-content"
-        backgroundColor={HOLIDAY_COLORS.backgroundStart}
+        backgroundColor={WINTER_COLORS.backgroundStart}
         translucent={false}
       />
       <SafeAreaView style={styles.backgroundStyle}>
@@ -204,19 +205,19 @@ const NumberInputScreen = ({navigation}: any) => {
                 ]}>
                   <View style={styles.santaCard}>
                   <View style={styles.santaIconWrapper}>
-                    <Text style={styles.santaIcon}>🎅</Text>
+                    <Text style={styles.santaIcon}>❄️</Text>
                   </View>
                   <View style={styles.santaTextWrapper}>
-                    <Text style={styles.santaTitle}>산타가 전하는 따뜻한 한 잔</Text>
+                    <Text style={styles.santaTitle}>겨울이 전하는 따뜻한 한 잔</Text>
                     <Text style={styles.santaSubtitle}>
-                      방문해 주신 고객님께 감사드리며, 행복한 연말 되시길 바랍니다!
+                      추운 겨울, 방문해 주신 고객님께 감사드리며 따뜻한 하루 되시길 바랍니다!
                     </Text>
                   </View>
                 </View>
                 <View style={styles.holidayBadge}>
-                  <Text style={styles.holidayBadgeText}>Merry Christmas</Text>
+                  <Text style={styles.holidayBadgeText}>Winter Edition</Text>
                   <Text style={styles.holidayBadgeSubText}>
-                    포근한 공간에서 한 잔을 더 즐겨요
+                    따뜻한 공간에서 한 잔을 더 즐겨요
                   </Text>
                 </View>
                 <View style={styles.labelBox}>
@@ -347,7 +348,7 @@ const NumberInputScreen = ({navigation}: any) => {
                             style={({pressed}) => [
                               {
                                 backgroundColor: pressed
-                                ? '#E3F2E8'
+                                ? '#D5E5F2'
                                 : 'rgba(255, 255, 255, 0.96)',
                                 borderRadius: 10,
                               },
@@ -366,7 +367,7 @@ const NumberInputScreen = ({navigation}: any) => {
                         style={({pressed}) => [
                           {
                             backgroundColor: pressed
-                              ? '#E3F2E8'
+                              ? '#D5E5F2'
                               : 'rgba(255, 255, 255, 0.96)',
                             borderRadius: 10,
                           },
@@ -380,7 +381,7 @@ const NumberInputScreen = ({navigation}: any) => {
                         style={({pressed}) => [
                           {
                             backgroundColor: pressed
-                              ? '#E3F2E8'
+                              ? '#D5E5F2'
                               : 'rgba(255, 255, 255, 0.96)',
                             borderRadius: 10,
                           },
@@ -403,7 +404,7 @@ const NumberInputScreen = ({navigation}: any) => {
                     ]}
                     onPress={onConfirmPress}>
                     <LinearGradient
-                      colors={[HOLIDAY_COLORS.primary, HOLIDAY_COLORS.primary]}
+                      colors={['#5AADD4', '#3B8DB8']}
                       locations={[0.2, 1]}
                       start={{x: 0, y: 0}}
                       end={{x: 1, y: 1}}
@@ -551,7 +552,7 @@ const NumberInputScreen = ({navigation}: any) => {
                 }}
                 onPress={() => setAgree(!agree)}>
                   <CheckIcon
-                    color={agree ? HOLIDAY_COLORS.primary : '#CFCFCF'}
+                    color={agree ? WINTER_COLORS.accent : '#CFCFCF'}
                   />
                   <Text style={styles.bottomText}>
                     이용약관을 모두 읽었으며 해당 내용에 모두 동의합니다.
@@ -563,7 +564,7 @@ const NumberInputScreen = ({navigation}: any) => {
                     {
                       width: pressed ? '98%' : '100%',
                       backgroundColor: agree
-                        ? HOLIDAY_COLORS.primary
+                        ? WINTER_COLORS.accent
                         : '#CFCFCF',
                       shadowOpacity: agree ? 0.45 : 0,
                     },
@@ -573,7 +574,7 @@ const NumberInputScreen = ({navigation}: any) => {
                   <LinearGradient
                     colors={
                       agree
-                        ? [HOLIDAY_COLORS.primary, HOLIDAY_COLORS.accent]
+                        ? ['#2D4159', '#5AADD4']
                         : ['#EDEDED', '#EDEDED']
                     }
                     locations={[0.3, 1]}
@@ -652,25 +653,25 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   holidayBadge: {
-    backgroundColor: 'rgba(242, 209, 107, 0.16)',
+    backgroundColor: 'rgba(168, 216, 234, 0.16)',
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(242, 209, 107, 0.55)',
+    borderColor: 'rgba(168, 216, 234, 0.55)',
     marginBottom: 10,
     gap: 4,
   },
   holidayBadgeText: {
     fontSize: 16,
     fontFamily: 'Pretendard-SemiBold',
-    color: HOLIDAY_COLORS.accent,
+    color: WINTER_COLORS.accent,
     letterSpacing: -0.5,
   },
   holidayBadgeSubText: {
     fontSize: 12,
     fontFamily: 'Pretendard-Regular',
-    color: HOLIDAY_COLORS.softMint,
+    color: WINTER_COLORS.primary,
   },
   subLabelBox: {
     display: 'flex',
@@ -683,14 +684,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Medium',
     lineHeight: 48,
     letterSpacing: -1,
-    color: HOLIDAY_COLORS.softMint,
+    color: WINTER_COLORS.primary,
   },
   labelSubText: {
     fontSize: 24,
     fontFamily: 'Pretendard-Light',
     lineHeight: 32,
     letterSpacing: -1,
-    color: 'rgba(225, 240, 232, 0.9)',
+    color: 'rgba(232, 244, 248, 0.9)',
   },
   numberInputContainer: {
     width: '100%',
@@ -707,7 +708,7 @@ const styles = StyleSheet.create({
   },
   numberInputText: {
     fontSize: 42,
-    color: '#0E4132',
+    color: '#1A2332',
     fontFamily: 'SFUIDisplay-Regular',
   },
   headerNumberContainer: {
@@ -718,7 +719,7 @@ const styles = StyleSheet.create({
   },
   headerNumberText: {
     fontSize: 44,
-    color: HOLIDAY_COLORS.backgroundStart,
+    color: WINTER_COLORS.backgroundStart,
     fontFamily: 'SFUIDisplay-Medium',
     lineHeight: 48,
     letterSpacing: -1,
@@ -729,22 +730,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     padding: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(168, 216, 234, 0.12)',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(242, 209, 107, 0.4)',
+    borderColor: 'rgba(168, 216, 234, 0.4)',
   },
   santaIconWrapper: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: 'rgba(215, 240, 226, 0.2)',
+    backgroundColor: 'rgba(200, 214, 229, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   santaIcon: {
     fontSize: 30,
-    color: HOLIDAY_COLORS.accent,
+    color: WINTER_COLORS.accent,
   },
   santaTextWrapper: {
     flexShrink: 1,
@@ -753,12 +754,12 @@ const styles = StyleSheet.create({
   santaTitle: {
     fontSize: 17,
     fontFamily: 'SFUIDisplay-Semibold',
-    color: '#F6F0DF',
+    color: '#E8F4F8',
   },
   santaSubtitle: {
     fontSize: 14,
     fontFamily: 'Pretendard-Regular',
-    color: 'rgba(225, 240, 232, 0.82)',
+    color: 'rgba(232, 244, 248, 0.82)',
     lineHeight: 20,
   },
   confirmContainer: {
@@ -774,10 +775,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 344,
     height: 64,
-    backgroundColor: HOLIDAY_COLORS.primary,
+    backgroundColor: '#5AADD4',
     borderRadius: 24,
     // shadow
-    shadowColor: HOLIDAY_COLORS.accent,
+    shadowColor: '#3B8DB8',
     shadowOffset: {
       width: 0,
       height: 4.5,
@@ -806,7 +807,7 @@ const styles = StyleSheet.create({
     height: 450,
     width: 634,
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    borderColor: HOLIDAY_COLORS.accent,
+    borderColor: WINTER_COLORS.accent,
     borderWidth: 1,
     borderRadius: 24,
     padding: 24,

@@ -26,15 +26,16 @@ import {
 // import {BackgroundDeco} from '../../components/background';
 import LinearGradient from 'react-native-linear-gradient';
 
-const HOLIDAY_COLORS = {
-  backgroundStart: '#0B3D2E',
-  backgroundEnd: '#0D5C43',
-  accent: '#F2D16B',
-  primary: '#D7263D',
-  softMint: '#D7F0E2',
+const WINTER_COLORS = {
+  backgroundStart: '#1A2332',
+  backgroundEnd: '#2D4159',
+  accent: '#A8D8EA',
+  primary: '#E8F4F8',
+  iceBlue: '#C8D6E5',
+  deepSnow: '#F0F8FF',
 };
 
-// 총 13개까지
+// 윈터 테마 아이스 크리스탈 스탬프 (총 21개)
 const BALL_POSITIONS: {
   position: {
     top?: number;
@@ -48,38 +49,38 @@ const BALL_POSITIONS: {
 }[] = [
   {
     position: {bottom: -11, left: -55},
-    color: '#FF515D',
+    color: '#A8D8EA',
     size: 171,
     zIndex: 1,
-  }, // 1
-  {position: {bottom: -128, left: 45}, color: '#86AEFE', size: 171, zIndex: 6}, // 2
-  {position: {bottom: -42, left: 177}, color: '#9165DD', size: 171, zIndex: 5}, // 3
-  {position: {bottom: -59, right: 78}, color: '#FFAE62', size: 171, zIndex: 3}, // 4
-  {position: {bottom: -34, right: -36}, color: '#5DB0EB', size: 171, zIndex: 4}, // 5
+  }, // 1 - 아이스 블루
+  {position: {bottom: -128, left: 45}, color: '#C8D6E5', size: 171, zIndex: 6}, // 2 - 실버
+  {position: {bottom: -42, left: 177}, color: '#E8F4F8', size: 171, zIndex: 5}, // 3 - 프로스티 화이트
+  {position: {bottom: -59, right: 78}, color: '#89CFF0', size: 171, zIndex: 3}, // 4 - 베이비 블루
+  {position: {bottom: -34, right: -36}, color: '#A8D8EA', size: 171, zIndex: 4}, // 5 - 아이스 블루
 
-  {position: {bottom: 98, left: -48}, color: '#67B265', size: 171, zIndex: 6}, // 6
-  {position: {bottom: 13, left: 67}, color: '#FFB2F6', size: 171, zIndex: 13}, // 7
-  {position: {bottom: 70, left: 210}, color: '#FFF0A8', size: 171, zIndex: 2}, // 8
-  {position: {bottom: 78, right: 36}, color: '#67B265', size: 171, zIndex: 7}, // 9
+  {position: {bottom: 98, left: -48}, color: '#D5E5F2', size: 171, zIndex: 6}, // 6 - 라이트 블루
+  {position: {bottom: 13, left: 67}, color: '#C8D6E5', size: 171, zIndex: 13}, // 7 - 실버
+  {position: {bottom: 70, left: 210}, color: '#F0F8FF', size: 171, zIndex: 2}, // 8 - 딥 스노우
+  {position: {bottom: 78, right: 36}, color: '#A8D8EA', size: 171, zIndex: 7}, // 9 - 아이스 블루
 
-  {position: {bottom: 191, left: -42}, color: '#FFF0A8', size: 171, zIndex: 4}, // 10
-  {position: {bottom: 160, left: 103}, color: '#5DB0EB', size: 171, zIndex: 5}, // 11
-  {position: {bottom: 192, right: 62}, color: '#86AEFE', size: 171, zIndex: 1}, // 12
-  {position: {bottom: 160, right: -57}, color: '#FF515D', size: 171, zIndex: 6}, // 13
+  {position: {bottom: 191, left: -42}, color: '#E8F4F8', size: 171, zIndex: 4}, // 10 - 프로스티 화이트
+  {position: {bottom: 160, left: 103}, color: '#89CFF0', size: 171, zIndex: 5}, // 11 - 베이비 블루
+  {position: {bottom: 192, right: 62}, color: '#C8D6E5', size: 171, zIndex: 1}, // 12 - 실버
+  {position: {bottom: 160, right: -57}, color: '#A8D8EA', size: 171, zIndex: 6}, // 13 - 아이스 블루
   {
     position: {bottom: 287, left: -53},
-    color: '#5DB0EB',
+    color: '#D5E5F2',
     size: 171,
     zIndex: 3,
-  }, // 14
-  {position: {bottom: 262, left: 61}, color: '#FFAE62', size: 171, zIndex: 2}, // 15
-  {position: {bottom: 279, left: 167}, color: '#9165DD', size: 171, zIndex: 3}, // 16
-  {position: {bottom: 334, left: 278}, color: '#FFB2F6', size: 171, zIndex: 13}, // 17
-  {position: {bottom: 300, right: -38}, color: '#9165DD', size: 171, zIndex: 5}, // 18
+  }, // 14 - 라이트 블루
+  {position: {bottom: 262, left: 61}, color: '#89CFF0', size: 171, zIndex: 2}, // 15 - 베이비 블루
+  {position: {bottom: 279, left: 167}, color: '#C8D6E5', size: 171, zIndex: 3}, // 16 - 실버
+  {position: {bottom: 334, left: 278}, color: '#F0F8FF', size: 171, zIndex: 13}, // 17 - 딥 스노우
+  {position: {bottom: 300, right: -38}, color: '#E8F4F8', size: 171, zIndex: 5}, // 18 - 프로스티 화이트
 
-  {position: {top: 144, left: -5}, color: '#FF515D', size: 171, zIndex: 5}, // 19
-  {position: {top: 172, left: 135}, color: '#FFF0A8', size: 171, zIndex: 1}, // 20
-  {position: {top: 204, right: -31}, color: '#67B265', size: 171, zIndex: 5}, // 20
+  {position: {top: 144, left: -5}, color: '#A8D8EA', size: 171, zIndex: 5}, // 19 - 아이스 블루
+  {position: {top: 172, left: 135}, color: '#D5E5F2', size: 171, zIndex: 1}, // 20 - 라이트 블루
+  {position: {top: 204, right: -31}, color: '#89CFF0', size: 171, zIndex: 5}, // 21 - 베이비 블루
 ];
 
 type DashboardViewProps = {
@@ -296,11 +297,11 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
 
   return (
     <LinearGradient
-      colors={[HOLIDAY_COLORS.backgroundStart, HOLIDAY_COLORS.backgroundEnd]}
+      colors={[WINTER_COLORS.backgroundStart, WINTER_COLORS.backgroundEnd]}
       style={styles.container}>
       <StatusBar
         barStyle="light-content"
-        backgroundColor={HOLIDAY_COLORS.backgroundStart}
+        backgroundColor={WINTER_COLORS.backgroundStart}
         translucent={false}
       />
       <SafeAreaView style={styles.backgroundStyle}>
@@ -335,7 +336,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                       style={[
                         styles.labelTitleText,
                         {
-                          color: HOLIDAY_COLORS.accent,
+                          color: WINTER_COLORS.accent,
                         },
                       ]}>
                       스탬프 {Math.abs(user.stamps - prevUser.stamps)}개
@@ -353,7 +354,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                     style={[
                       styles.labelTitleText,
                       {
-                        color: HOLIDAY_COLORS.accent,
+                        color: WINTER_COLORS.accent,
                       },
                     ]}>
                     감사합니다
@@ -388,12 +389,12 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                   },
                 ]}>
                 <Pressable style={[styles.flexBox, {gap: 7}]} onPress={goBack}>
-                  <LeftArrowIcon />
+                  <LeftArrowIcon color='white'/>
                   <Text
                     style={{
                       fontSize: 20,
                       fontFamily: 'Pretendard-Regular',
-                      color: HOLIDAY_COLORS.softMint,
+                      color: WINTER_COLORS.primary,
                       lineHeight: 28,
                       letterSpacing: -1,
                     }}>
@@ -406,7 +407,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                       style={[
                         styles.labelSubText,
                         {
-                          color: HOLIDAY_COLORS.accent,
+                          color: WINTER_COLORS.accent,
                           fontFamily: 'SFUIDisplay-Semibold',
                         },
                       ]}>
@@ -444,7 +445,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                             gap: 4,
                             alignItems: 'center',
                           }}>
-                          <BeverageIcon color={HOLIDAY_COLORS.accent} />
+                          <BeverageIcon color={WINTER_COLORS.accent} />
                           <Text style={styles.beverageTitleText}>
                             조제음료 {user.beverageCoupons}잔 무료로 사용
                             가능해요!
@@ -466,7 +467,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                             gap: 4,
                             alignItems: 'center',
                           }}>
-                          <AmericanoIcon color={HOLIDAY_COLORS.accent} />
+                          <AmericanoIcon color={WINTER_COLORS.accent} />
                           <Text style={styles.beverageTitleText}>
                             아메리카노 {user.americanoCoupons}잔 무료로 사용
                             가능해요!
@@ -532,7 +533,7 @@ const DashboardView = ({phoneNumber, onClose}: DashboardViewProps) => {
                       style={[
                         styles.labelSubText,
                         {
-                          color: HOLIDAY_COLORS.primary,
+                          color: WINTER_COLORS.backgroundStart,
                         },
                       ]}>
                       현재 보유 스탬프
@@ -628,22 +629,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     padding: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(168, 216, 234, 0.12)',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(242, 209, 107, 0.4)',
+    borderColor: 'rgba(168, 216, 234, 0.4)',
   },
   santaIconWrapper: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: 'rgba(215, 240, 226, 0.2)',
+    backgroundColor: 'rgba(200, 214, 229, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   santaIcon: {
     fontSize: 30,
-    color: HOLIDAY_COLORS.accent,
+    color: WINTER_COLORS.accent,
   },
   santaTextWrapper: {
     flexShrink: 1,
@@ -652,34 +653,34 @@ const styles = StyleSheet.create({
   santaTitle: {
     fontSize: 17,
     fontFamily: 'SFUIDisplay-Semibold',
-    color: '#F6F0DF',
+    color: '#E8F4F8',
   },
   santaSubtitle: {
     fontSize: 14,
     fontFamily: 'Pretendard-Regular',
-    color: 'rgba(225, 240, 232, 0.82)',
+    color: 'rgba(232, 244, 248, 0.82)',
     lineHeight: 20,
   },
   holidayBadge: {
-    backgroundColor: 'rgba(242, 209, 107, 0.16)',
+    backgroundColor: 'rgba(168, 216, 234, 0.16)',
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(242, 209, 107, 0.55)',
+    borderColor: 'rgba(168, 216, 234, 0.55)',
     marginBottom: 10,
     gap: 4,
   },
   holidayBadgeText: {
     fontSize: 16,
     fontFamily: 'Pretendard-SemiBold',
-    color: HOLIDAY_COLORS.accent,
+    color: WINTER_COLORS.accent,
     letterSpacing: -0.5,
   },
   holidayBadgeSubText: {
     fontSize: 12,
     fontFamily: 'Pretendard-Regular',
-    color: HOLIDAY_COLORS.softMint,
+    color: WINTER_COLORS.primary,
   },
   subLabelBox: {
     display: 'flex',
@@ -692,21 +693,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Medium',
     lineHeight: 45,
     letterSpacing: -1,
-    color: HOLIDAY_COLORS.softMint,
+    color: WINTER_COLORS.primary,
   },
   labelSubText: {
     fontSize: 20,
     fontFamily: 'Pretendard-Regular',
     lineHeight: 28,
     letterSpacing: -1,
-    color: 'rgba(225, 240, 232, 0.9)',
+    color: 'rgba(232, 244, 248, 0.9)',
   },
   stampLeftText: {
     fontSize: 76,
     fontFamily: 'Pretendard-Medium',
     lineHeight: 86,
     letterSpacing: -1,
-    color: HOLIDAY_COLORS.accent,
+    color: WINTER_COLORS.accent,
   },
   stampRightText: {
     fontSize: 28,
@@ -726,7 +727,7 @@ const styles = StyleSheet.create({
   beverageBox: {
     width: '100%',
     height: 98,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(168, 216, 234, 0.12)',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 16,
@@ -739,14 +740,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 28,
     fontFamily: 'Pretendard-Medium',
-    color: HOLIDAY_COLORS.softMint,
+    color: WINTER_COLORS.primary,
     letterSpacing: -1,
   },
   beverageBodyText: {
     fontSize: 16,
     lineHeight: 26,
     fontFamily: 'Pretendard-Regular',
-    color: 'rgba(215, 240, 226, 0.9)',
+    color: 'rgba(232, 244, 248, 0.9)',
     letterSpacing: -1,
   },
 });

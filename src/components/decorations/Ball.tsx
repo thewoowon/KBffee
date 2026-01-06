@@ -7,8 +7,9 @@ type BallProps = {
 };
 
 const Ball = ({size, color}: BallProps) => {
-  const ribbonWidth = size * 0.15;
-  const ribbonColor = '#FFD700'; // 금색 리본
+  const centerSize = size * 0.3;
+  const armWidth = size * 0.12;
+  const armLength = size * 0.9;
 
   return (
     <View
@@ -16,61 +17,156 @@ const Ball = ({size, color}: BallProps) => {
         width: size,
         height: size,
         position: 'relative',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}>
-      {/* 선물 상자 본체 */}
+      {/* 눈송이 중앙 */}
       <View
         style={{
-          width: size,
-          height: size,
-          borderRadius: size * 0.1,
+          position: 'absolute',
+          width: centerSize,
+          height: centerSize,
           backgroundColor: color,
-          borderWidth: 2,
-          borderColor: 'rgba(0,0,0,0.1)',
+          borderRadius: centerSize / 2,
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.6,
+          shadowRadius: 8,
+          elevation: 5,
         }}
       />
 
-      {/* 세로 리본 */}
+      {/* 메인 수평 라인 */}
       <View
         style={{
           position: 'absolute',
-          width: ribbonWidth,
-          height: size,
-          backgroundColor: ribbonColor,
-          left: (size - ribbonWidth) / 2,
-          top: 0,
-          borderLeftWidth: 1,
-          borderRightWidth: 1,
-          borderColor: 'rgba(0,0,0,0.15)',
+          width: armLength,
+          height: armWidth,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.4,
+          shadowRadius: 4,
         }}
       />
 
-      {/* 가로 리본 */}
+      {/* 메인 수직 라인 */}
       <View
         style={{
           position: 'absolute',
-          width: size,
-          height: ribbonWidth,
-          backgroundColor: ribbonColor,
-          left: 0,
-          top: (size - ribbonWidth) / 2,
-          borderTopWidth: 1,
-          borderBottomWidth: 1,
-          borderColor: 'rgba(0,0,0,0.15)',
+          width: armWidth,
+          height: armLength,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.4,
+          shadowRadius: 4,
         }}
       />
 
-      {/* 리본 매듭 (중앙) */}
+      {/* 대각선 라인 (왼쪽 위 -> 오른쪽 아래) */}
       <View
         style={{
           position: 'absolute',
-          width: ribbonWidth * 1.8,
-          height: ribbonWidth * 1.8,
-          backgroundColor: ribbonColor,
-          borderRadius: ribbonWidth * 0.9,
-          left: (size - ribbonWidth * 1.8) / 2,
-          top: (size - ribbonWidth * 1.8) / 2,
-          borderWidth: 2,
-          borderColor: 'rgba(0,0,0,0.2)',
+          width: armLength * 0.85,
+          height: armWidth,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          transform: [{rotate: '45deg'}],
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+        }}
+      />
+
+      {/* 대각선 라인 (오른쪽 위 -> 왼쪽 아래) */}
+      <View
+        style={{
+          position: 'absolute',
+          width: armLength * 0.85,
+          height: armWidth,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          transform: [{rotate: '-45deg'}],
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+        }}
+      />
+
+      {/* 상단 작은 가지 (왼쪽) */}
+      <View
+        style={{
+          position: 'absolute',
+          width: armWidth * 0.7,
+          height: armLength * 0.25,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          transform: [{rotate: '-30deg'}],
+          top: size * 0.15,
+          left: size * 0.25,
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+        }}
+      />
+
+      {/* 상단 작은 가지 (오른쪽) */}
+      <View
+        style={{
+          position: 'absolute',
+          width: armWidth * 0.7,
+          height: armLength * 0.25,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          transform: [{rotate: '30deg'}],
+          top: size * 0.15,
+          right: size * 0.25,
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+        }}
+      />
+
+      {/* 하단 작은 가지 (왼쪽) */}
+      <View
+        style={{
+          position: 'absolute',
+          width: armWidth * 0.7,
+          height: armLength * 0.25,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          transform: [{rotate: '30deg'}],
+          bottom: size * 0.15,
+          left: size * 0.25,
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+        }}
+      />
+
+      {/* 하단 작은 가지 (오른쪽) */}
+      <View
+        style={{
+          position: 'absolute',
+          width: armWidth * 0.7,
+          height: armLength * 0.25,
+          backgroundColor: color,
+          borderRadius: armWidth / 2,
+          transform: [{rotate: '-30deg'}],
+          bottom: size * 0.15,
+          right: size * 0.25,
+          shadowColor: color,
+          shadowOffset: {width: 0, height: 0},
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
         }}
       />
     </View>
